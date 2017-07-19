@@ -1,4 +1,4 @@
-package org.jenkinsci.plugins.azurecommons;
+package com.microsoft.jenkins.azurecommons;
 import hudson.Launcher;
 import hudson.Extension;
 import hudson.FilePath;

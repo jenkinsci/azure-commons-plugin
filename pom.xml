@@ -17,6 +17,7 @@
 
     <properties>
         <jenkins.version>1.625.3</jenkins.version>
+        <instrkey>6ae493da-d27b-4cab-9056-e5be4780f50d</instrkey>
     </properties>
 
     <name>Azure Commons Plugin</name>
@@ -39,9 +40,9 @@
     </developers>
 
     <scm>
-        <connection>scm:git:git://github.com/jenkinsci/${project.artifactId}-plugin.git</connection>
-        <developerConnection>scm:git:git@github.com:jenkinsci/${project.artifactId}-plugin.git</developerConnection>
-        <url>https://github.com/jenkinsci/${project.artifactId}-plugin</url>
+        <connection>scm:git:git://github.com/microsoft/${project.artifactId}-plugin.git</connection>
+        <developerConnection>scm:git:git@github.com:microsoft/${project.artifactId}-plugin.git</developerConnection>
+        <url>https://github.com/microsoft/${project.artifactId}-plugin</url>
     </scm>
 
     <repositories>
@@ -58,14 +59,21 @@
         </pluginRepository>
     </pluginRepositories>
 
-    <!-- If you want to depend on other plugins:
+    <build>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
+    </build>
+
     <dependencies>
-      <dependency>
-        <groupId>org.jenkins-ci.plugins</groupId>
-        <artifactId>credentials</artifactId>
-        <version>2.0</version>
-      </dependency>
+        <dependency>
+            <groupId>com.microsoft.azure</groupId>
+            <artifactId>applicationinsights-web</artifactId>
+            <version>1.0.3</version>
+        </dependency>
     </dependencies>
-    -->
 
 </project>
