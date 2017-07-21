@@ -16,7 +16,7 @@
     <f:section title="Azure">
         <f:nested>
             <f:checkbox field="appInsightsEnabled" default="true"
-                        title="${%Enable_App_Insights_Title}}"
+                        title="${%Enable_App_Insights_Title}"
                         checked="${descriptor.appInsightsEnabled}"/>
         </f:nested>
     </f:section>
