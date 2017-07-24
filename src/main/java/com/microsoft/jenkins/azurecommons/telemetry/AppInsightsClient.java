@@ -20,6 +20,10 @@ import java.util.logging.Logger;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+/**
+ * Client for App Insights.
+ * To enable AI in local env(mvn hpi:run), you need set env variable first: export APPLICATION_INSIGHTS_IKEY=<YOUR key>.
+ */
 public class AppInsightsClient {
     private static final Logger LOGGER = Logger.getLogger(AppInsightsClient.class.getName());
 
