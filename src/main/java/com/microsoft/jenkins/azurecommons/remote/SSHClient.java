@@ -33,13 +33,37 @@ import java.util.Properties;
 public class SSHClient implements AutoCloseable {
     private final String host;
     private final int port;
-    private final String username;
-    private final StandardUsernameCredentials credentials;
+    private final UsernameAuth credentials;
 
     private final JSch jsch;
-    private final Session session;
+    private Session session;
 
     private PrintStream logger;
+
+    public SSHClient(
+            final String host,
+            final int port,
+            final String username,
+            final String password) throws JSchException {
+        this(host, port, new UsernamePasswordAuth(username, password));
+    }
+
+    public SSHClient(
+            final String host,
+            final int port,
+            final String username,
+            final Secret passPhrase,
+            final String... privateKeys) throws JSchException {
+        this(host, port, new UsernamePrivateKeyAuth(username, passPhrase, privateKeys));
+    }
+
+
+    public SSHClient(
+            final String host,
+            final int port,
+            final StandardUsernameCredentials credentials) throws JSchException {
+        this(host, port, UsernameAuth.fromCredentials(credentials));
+    }
 
     /**
      * SSH client to the remote host with given credentials.
@@ -50,58 +74,32 @@ public class SSHClient implements AutoCloseable {
      * <li>Implementation of {@link StandardUsernamePasswordCredentials} with username and password.</li>
      * </ul>
      *
-     * @param host        the SSH server name or IP address.
-     * @param port        the SSH service port.
-     * @param credentials the SSH authentication credentials.
+     * @param host the SSH server name or IP address.
+     * @param port the SSH service port.
+     * @param auth the SSH authentication credentials.
+     * @throws JSchException if the passed in parameters are not valid, e.g., null username
      */
     public SSHClient(
             final String host,
             final int port,
-            final StandardUsernameCredentials credentials) {
+            final UsernameAuth auth) throws JSchException {
         this.host = host;
         this.port = port;
-        this.username = credentials.getUsername();
 
         this.jsch = new JSch();
-        this.credentials = credentials;
-        if (credentials instanceof SSHUserPrivateKey) {
-            SSHUserPrivateKey userPrivateKey = (SSHUserPrivateKey) credentials;
-            final Secret userPassphrase = userPrivateKey.getPassphrase();
-            String passphrase = null;
-            if (userPassphrase != null) {
-                passphrase = userPassphrase.getPlainText();
-            }
-            byte[] passphraseBytes = null;
+        this.credentials = auth;
+        if (auth instanceof UsernamePrivateKeyAuth) {
+            UsernamePrivateKeyAuth userPrivateKey = (UsernamePrivateKeyAuth) auth;
+            byte[] passphraseBytes = userPrivateKey.getPassPhraseBytes();
 
-            if (passphrase != null) {
-                passphraseBytes = passphrase.getBytes(Constants.DEFAULT_CHARSET);
-            }
             int seq = 0;
             for (String privateKey : userPrivateKey.getPrivateKeys()) {
-                String name = this.username;
+                String name = auth.getUsername();
                 if (seq++ != 0) {
                     name += "-" + seq;
                 }
-                try {
-                    jsch.addIdentity(name, privateKey.getBytes(Constants.DEFAULT_CHARSET), null, passphraseBytes);
-                } catch (JSchException e) {
-                    throw new IllegalArgumentException(Messages.SSHClient_failedToCreateSession(), e);
-                }
+                jsch.addIdentity(name, privateKey.getBytes(Constants.DEFAULT_CHARSET), null, passphraseBytes);
             }
-        }
-
-        try {
-            this.session = jsch.getSession(this.username, this.host, this.port);
-            Properties config = new Properties();
-            config.put("StrictHostKeyChecking", "no");
-            this.session.setConfig(config);
-            if (credentials instanceof StandardUsernamePasswordCredentials) {
-                this.session.setPassword(
-                        ((StandardUsernamePasswordCredentials) credentials).getPassword().getPlainText());
-            }
-            this.session.connect();
-        } catch (JSchException e) {
-            throw new IllegalArgumentException(Messages.SSHClient_failedToCreateSession(), e);
         }
     }
 
@@ -113,6 +111,39 @@ public class SSHClient implements AutoCloseable {
      */
     public SSHClient withLogger(PrintStream log) {
         this.logger = log;
+        return this;
+    }
+
+    /**
+     * Establish a connection with the SSH server.
+     * <p>
+     * Remember to {@link #close()} the client after a session is established and it's no longer used. You may use
+     * the try with resource statement block.
+     * <pre><code>
+     * try (SSHClient connected = notConnected.connect()) {
+     *     // do things with the connected instance
+     * }
+     * </code></pre>
+     * <p>
+     * This method can be called again if the the current session is closed. Otherwise if called on a connected
+     * instance, a JSchException will be thrown.
+     *
+     * @return the current instance so it can be used in try with resource block.
+     * @throws JSchException if the client is already connected or error occurs during the connection.
+     */
+    public SSHClient connect() throws JSchException {
+        if (session != null && session.isConnected()) {
+            throw new JSchException(Messages.SSHClient_sessionAlreadyConnected());
+        }
+        session = jsch.getSession(credentials.getUsername(), host, port);
+        Properties config = new Properties();
+        config.put("StrictHostKeyChecking", "no");
+        session.setConfig(config);
+        if (credentials instanceof UsernamePasswordAuth) {
+            session.setPassword(
+                    ((UsernamePasswordAuth) credentials).getPassword().getPlainText());
+        }
+        session.connect();
         return this;
     }
 
@@ -152,7 +183,7 @@ public class SSHClient implements AutoCloseable {
             try {
                 in.close();
             } catch (IOException e) {
-                log("Failed to close input stream: " + e.getMessage());
+                log(Messages.SSHClient_failedToCloseInputStream(e.getMessage()));
             }
         }
     }
@@ -301,21 +332,21 @@ public class SSHClient implements AutoCloseable {
      * <p>
      * We can first establish an SSH connection to host A, and then use the port forwarding to forward the connection
      * to the local port through the SSH connection of host A to reach the SSH server on host B.
-     * <p>
      * <pre><code>
      *     SSHClient connectionToA = new SSHClient(host_A, port_A, credentials_A);
      *     SSHClient tunnelConnectionToB = connectionToA.forwardSSH(host_B, port_B, credentials_B);
      *     tunnelConnectionToB.execRemote("ls"); // ls executed on host B
      * </code></pre>
      *
-     * @param remoteHost the target host name or IP address, which is accessible from the SSH target of the current
-     *                   SSHClient.
-     * @param remotePort the SSH service port on the target host.
+     * @param remoteHost     the target host name or IP address, which is accessible from the SSH target of the current
+     *                       SSHClient.
+     * @param remotePort     the SSH service port on the target host.
+     * @param sshCredentials SSH authentication credentials
      * @return A new SSH client to the target host through the current SSH client.
      * @throws JSchException if error occurs during the SSH operations.
      */
     public SSHClient forwardSSH(final String remoteHost, final int remotePort,
-                                final StandardUsernameCredentials sshCredentials) throws JSchException {
+                                final UsernameAuth sshCredentials) throws JSchException {
         int localPort = session.setPortForwardingL(0, remoteHost, remotePort);
         return new SSHClient("127.0.0.1", localPort, sshCredentials).withLogger(logger);
     }
@@ -329,10 +360,10 @@ public class SSHClient implements AutoCloseable {
     }
 
     public String getUsername() {
-        return username;
+        return credentials.getUsername();
     }
 
-    public StandardUsernameCredentials getCredentials() {
+    public UsernameAuth getCredentials() {
         return credentials;
     }
 
@@ -340,6 +371,7 @@ public class SSHClient implements AutoCloseable {
     public void close() {
         if (this.session != null) {
             this.session.disconnect();
+            this.session = null;
         }
     }
 
