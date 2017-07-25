@@ -14,11 +14,16 @@ import java.util.Map;
 
 public class AppInsightsClientFactory {
     private static Map<Class<? extends Plugin>, AppInsightsClient> appInsightsClientMap = new HashMap<>();
+    private static Object lock = new Object();
 
     public static AppInsightsClient getInstance(final Class<? extends Plugin> clazz) {
         if (!appInsightsClientMap.containsKey(clazz)) {
-            final Plugin plugin = Jenkins.getActiveInstance().getPlugin(clazz);
-            appInsightsClientMap.put(clazz, new AppInsightsClient(plugin));
+            synchronized (lock) {
+                if (!appInsightsClientMap.containsKey(clazz)) {
+                    final Plugin plugin = Jenkins.getActiveInstance().getPlugin(clazz);
+                    appInsightsClientMap.put(clazz, new AppInsightsClient(plugin));
+                }
+            }
         }
 
         return appInsightsClientMap.get(clazz);
