@@ -247,10 +247,12 @@ public class SSHClient implements AutoCloseable {
      * @throws IOException   if it fails to read the output from the remote channel.
      */
     public String execRemote(final String command) throws JSchException, IOException {
-        return execRemote(command, true);
+        return execRemote(command, true, true);
     }
 
-    public String execRemote(final String command, final boolean showCommand) throws JSchException, IOException {
+    public String execRemote(final String command,
+                             final boolean showCommand,
+                             final boolean capture) throws JSchException, IOException {
         ChannelExec channel = null;
         try {
 
@@ -263,43 +265,63 @@ public class SSHClient implements AutoCloseable {
             ByteArrayOutputStream output = new ByteArrayOutputStream();
             byte[] buffer = new byte[Constants.READ_BUFFER_SIZE];
 
-            channel.connect();
-            InputStream in = channel.getInputStream();
-
             if (logger != null) {
                 channel.setErrStream(logger, true);
-            }
-
-            while (true) {
-                do {
-                    // blocks on IO
-                    int len = in.read(buffer, 0, buffer.length);
-                    if (len < 0) {
-                        break;
-                    }
-                    output.write(buffer, 0, len);
-                } while (in.available() > 0);
-
-                if (channel.isClosed()) {
-                    if (in.available() > 0) {
-                        continue;
-                    }
-                    log(Messages.SSHClient_commandExitStatus(channel.getExitStatus()));
-                    if (channel.getExitStatus() != 0) {
-                        throw new RuntimeException(Messages.SSHClient_errorExecution(channel.getExitStatus()));
-                    }
-                    break;
+                if (!capture) {
+                    channel.setOutputStream(logger, true);
                 }
             }
-            String serverOutput = output.toString(Constants.DEFAULT_CHARSET.name());
-            log(Messages.SSHClient_output(serverOutput));
-            return serverOutput;
+
+            channel.connect();
+
+            if (!capture) {
+                while (!channel.isClosed()) {
+                    try {
+                        Thread.sleep(200);
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                        throw new JSchException("", e);
+                    }
+                }
+                checkExitStatus(channel.getExitStatus());
+                return "";
+            } else {
+                InputStream in = channel.getInputStream();
+                while (true) {
+                    do {
+                        // blocks on IO
+                        int len = in.read(buffer, 0, buffer.length);
+                        if (len < 0) {
+                            break;
+                        }
+                        output.write(buffer, 0, len);
+                    } while (in.available() > 0);
+
+                    if (channel.isClosed()) {
+                        if (in.available() > 0) {
+                            continue;
+                        }
+                        checkExitStatus(channel.getExitStatus());
+                        break;
+                    }
+                }
+                String serverOutput = output.toString(Constants.DEFAULT_CHARSET.name());
+                log(Messages.SSHClient_output(serverOutput));
+                return serverOutput;
+            }
         } catch (UnsupportedEncodingException e) {
             throw new IllegalArgumentException(Messages.SSHClient_failedExecution(), e);
         } finally {
             if (channel != null) {
                 channel.disconnect();
             }
+        }
+    }
+
+    private void checkExitStatus(int code) throws JSchException {
+        log(Messages.SSHClient_commandExitStatus(code));
+        if (code != 0) {
+            throw new RuntimeException(Messages.SSHClient_errorExecution(code));
         }
     }
 
