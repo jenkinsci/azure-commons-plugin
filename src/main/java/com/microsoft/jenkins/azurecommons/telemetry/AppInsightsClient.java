@@ -47,7 +47,7 @@ public class AppInsightsClient {
                 final TelemetryClient telemetryClient = getTelemetryClient();
                 telemetryClient.trackEvent(eventName, formalizedProperties, null);
                 telemetryClient.flush();
-                LOGGER.info("Event sent to AI successfully: " + eventName);
+                LOGGER.info("AI: " + eventName);
             }
         } catch (Exception e) {
             LOGGER.warning("Fail to send trace to App Insights due to:" + e.getMessage());
