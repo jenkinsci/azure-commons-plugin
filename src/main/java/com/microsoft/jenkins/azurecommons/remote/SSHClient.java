@@ -246,13 +246,13 @@ public class SSHClient implements AutoCloseable {
      * @throws JSchException if the underlying SSH session fails.
      * @throws IOException   if it fails to read the output from the remote channel.
      */
-    public String execRemote(final String command) throws JSchException, IOException {
+    public String execRemote(final String command) throws JSchException, IOException, ExitStatusException {
         return execRemote(command, true, true);
     }
 
     public String execRemote(final String command,
                              final boolean showCommand,
-                             final boolean capture) throws JSchException, IOException {
+                             final boolean capture) throws JSchException, IOException, ExitStatusException {
         ChannelExec channel = null;
         try {
 
@@ -283,7 +283,11 @@ public class SSHClient implements AutoCloseable {
                         throw new JSchException("", e);
                     }
                 }
-                checkExitStatus(channel.getExitStatus());
+                int exitCode = channel.getExitStatus();
+                log(Messages.SSHClient_commandExitStatus(exitCode));
+                if (exitCode != 0) {
+                    throw new ExitStatusException(exitCode, "");
+                }
                 return "";
             } else {
                 InputStream in = channel.getInputStream();
@@ -301,12 +305,16 @@ public class SSHClient implements AutoCloseable {
                         if (in.available() > 0) {
                             continue;
                         }
-                        checkExitStatus(channel.getExitStatus());
                         break;
                     }
                 }
+                int exitCode = channel.getExitStatus();
+                log(Messages.SSHClient_commandExitStatus(exitCode));
                 String serverOutput = output.toString(Constants.DEFAULT_CHARSET.name());
                 log(Messages.SSHClient_output(serverOutput));
+                if (exitCode != 0) {
+                    throw new ExitStatusException(exitCode, serverOutput);
+                }
                 return serverOutput;
             }
         } catch (UnsupportedEncodingException e) {
@@ -315,13 +323,6 @@ public class SSHClient implements AutoCloseable {
             if (channel != null) {
                 channel.disconnect();
             }
-        }
-    }
-
-    private void checkExitStatus(int code) throws JSchException {
-        log(Messages.SSHClient_commandExitStatus(code));
-        if (code != 0) {
-            throw new RuntimeException(Messages.SSHClient_errorExecution(code));
         }
     }
 
@@ -405,5 +406,24 @@ public class SSHClient implements AutoCloseable {
 
     private interface ChannelSftpConsumer {
         void apply(ChannelSftp channel) throws JSchException, SftpException;
+    }
+
+    public static class ExitStatusException extends Exception {
+        private final int exitStatus;
+        private final String output;
+
+        public ExitStatusException(int exitStatus, String output) {
+            super(Messages.SSHClient_commandExitStatusException(exitStatus));
+            this.exitStatus = exitStatus;
+            this.output = output;
+        }
+
+        public int getExitStatus() {
+            return exitStatus;
+        }
+
+        public String getOutput() {
+            return output;
+        }
     }
 }
