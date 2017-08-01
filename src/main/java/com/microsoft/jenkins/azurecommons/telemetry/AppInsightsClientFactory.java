@@ -20,7 +20,14 @@ public class AppInsightsClientFactory {
         if (!appInsightsClientMap.containsKey(clazz)) {
             synchronized (lock) {
                 if (!appInsightsClientMap.containsKey(clazz)) {
-                    final Plugin plugin = Jenkins.getActiveInstance().getPlugin(clazz);
+                    Plugin plugin = null;
+                    final Jenkins jenkins = Jenkins.getInstance();
+                    if (jenkins != null) {
+                        plugin = jenkins.getPlugin(clazz);
+                    }
+                    if (plugin == null) {
+                        plugin = new Plugin.DummyImpl();
+                    }
                     appInsightsClientMap.put(clazz, new AppInsightsClient(plugin));
                 }
             }

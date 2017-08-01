@@ -34,13 +34,12 @@ public class AppInsightsClient {
     private TelemetryClient telemetryClient;
 
     public AppInsightsClient(final Plugin plugin) {
-        checkNotNull(plugin, "Jenkins plugin install is null");
         this.plugin = plugin;
     }
 
     public void sendEvent(final String item, final String action, final Map<String, String> properties, final boolean force) {
         try {
-            if (AppInsightsGlobalConfig.get().isAppInsightsEnabled() || force) {
+            if (this.plugin != null && (AppInsightsGlobalConfig.get().isAppInsightsEnabled() || force)) {
                 final String eventName = buildEventName(item, action);
                 final Map<String, String> formalizedProperties = formalizeProperties(properties);
 
@@ -118,11 +117,12 @@ public class AppInsightsClient {
     }
 
     private String jenkinsInstanceId() {
-        return Jenkins.getActiveInstance().getLegacyInstanceId();
+        final Jenkins jenkins = Jenkins.getInstance();
+        return jenkins != null ? jenkins.getLegacyInstanceId() : "local";
     }
 
     private String jenkinsVersion() {
         final VersionNumber version = Jenkins.getVersion();
-        return version == null ? null : version.toString();
+        return version == null ? "local" : version.toString();
     }
 }
