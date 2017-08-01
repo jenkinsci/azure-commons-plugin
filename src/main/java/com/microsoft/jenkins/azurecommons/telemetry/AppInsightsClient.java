@@ -117,11 +117,12 @@ public class AppInsightsClient {
     }
 
     private String jenkinsInstanceId() {
-        return Jenkins.getActiveInstance().getLegacyInstanceId();
+        final Jenkins jenkins = Jenkins.getInstance();
+        return jenkins != null ? jenkins.getLegacyInstanceId() : "local";
     }
 
     private String jenkinsVersion() {
         final VersionNumber version = Jenkins.getVersion();
-        return version == null ? null : version.toString();
+        return version == null ? "local" : version.toString();
     }
 }
