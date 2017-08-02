@@ -9,8 +9,11 @@ package com.microsoft.jenkins.azurecommons.telemetry;
 
 import com.microsoft.applicationinsights.TelemetryClient;
 import hudson.Plugin;
+import hudson.model.Computer;
+import hudson.node_monitors.ArchitectureMonitor;
 import hudson.util.VersionNumber;
 import jenkins.model.Jenkins;
+import net.sf.json.JSONObject;
 import org.apache.commons.lang.StringUtils;
 
 import java.util.HashMap;
@@ -97,32 +100,44 @@ public class AppInsightsClient {
         return stringBuilder.toString();
     }
 
-    private Map<String, String> formalizeProperties(final Map<String, String> properties) {
-        final Map<String, String> props = properties == null ? new HashMap<String, String>() : properties;
+    private Map<String, String> formalizeProperties(Map<String, String> properties) {
+        if (properties == null)
+            properties = new HashMap<>();
 
-        props.put(AppInsightsConstants.PROP_JENKINS_INSTAMCE_ID, jenkinsInstanceId());
-        props.put(AppInsightsConstants.PROP_JENKINS_VERSION, jenkinsVersion());
-        props.put(AppInsightsConstants.PROP_PLUGIN_NAME, plugin.getWrapper().getDisplayName());
-        props.put(AppInsightsConstants.PROP_PLUGIN_VERSION, plugin.getWrapper().getVersion());
+        putJenkinsInfo(properties);
+        properties.put(AppInsightsConstants.PROP_PLUGIN_NAME, plugin.getWrapper().getDisplayName());
+        properties.put(AppInsightsConstants.PROP_PLUGIN_VERSION, plugin.getWrapper().getVersion());
 
         // Telemetry client doesn't accept null value for ConcurrentHashMap doesn't accept null key or null value.
-        for (final Iterator<Map.Entry<String, String>> iter = props.entrySet().iterator(); iter.hasNext(); ) {
+        for (final Iterator<Map.Entry<String, String>> iter = properties.entrySet().iterator(); iter.hasNext(); ) {
             final Map.Entry<String, String> entry = iter.next();
             if (StringUtils.isBlank(entry.getKey()) || StringUtils.isBlank(entry.getValue())) {
                 iter.remove();
             }
         }
 
-        return props;
+        return properties;
     }
 
-    private String jenkinsInstanceId() {
-        final Jenkins jenkins = Jenkins.getInstance();
-        return jenkins != null ? jenkins.getLegacyInstanceId() : "local";
-    }
+    private void putJenkinsInfo(final Map<String, String> properties) {
+        final Jenkins j = Jenkins.getInstance();
+        if (j == null) {
+            properties.put(AppInsightsConstants.PROP_JENKINS_INSTAMCE_ID, "local");
+            properties.put(AppInsightsConstants.PROP_JENKINS_VERSION, "local");
+            return;
+        }
 
-    private String jenkinsVersion() {
-        final VersionNumber version = Jenkins.getVersion();
-        return version == null ? "local" : version.toString();
+        properties.put(AppInsightsConstants.PROP_JENKINS_INSTAMCE_ID, j.getLegacyInstanceId());
+        properties.put(AppInsightsConstants.PROP_JENKINS_VERSION, j.VERSION);
+        for (Computer c : j.getComputers()) {
+            if (c.getNode() == j) {
+                properties.put("master", "true");
+                properties.put("jvm-vendor", System.getProperty("java.vm.vendor"));
+                properties.put("jvm-name", System.getProperty("java.vm.name"));
+                properties.put("jvm-version", System.getProperty("java.version"));
+            }
+            ArchitectureMonitor.DescriptorImpl descriptor = j.getDescriptorByType(ArchitectureMonitor.DescriptorImpl.class);
+            properties.put("os", descriptor.get(c));
+        }
     }
 }

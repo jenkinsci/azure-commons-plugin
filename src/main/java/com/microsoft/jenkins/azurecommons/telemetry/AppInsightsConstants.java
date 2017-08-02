@@ -16,6 +16,10 @@ public class AppInsightsConstants {
     public static final String PROP_JENKINS_VERSION = "JenkinsVersion";
     public static final String PROP_PLUGIN_NAME = "PluginName";
     public static final String PROP_PLUGIN_VERSION = "PluginVersion";
+    public static final String JENKINS = "Jenkins";
+    public static final String PLUGIN = "Plugin";
+    public static final String RESTART = "Restart";
+    public static final String LOAD= "Load";
 
     // items or properties related to Azure
     public static final String AZURE_SUBSCRIPTION_ID = "SubscriptionId";
