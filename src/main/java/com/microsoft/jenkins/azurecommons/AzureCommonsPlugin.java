@@ -9,11 +9,16 @@ package com.microsoft.jenkins.azurecommons;
 import com.microsoft.jenkins.azurecommons.telemetry.AppInsightsClientFactory;
 import hudson.Plugin;
 
+import java.util.HashMap;
 import java.util.Map;
 
 public class AzureCommonsPlugin extends Plugin {
-    public static void sendEvent(final String item, final String action, final Map<String, String> properties) {
-        sendEvent(item, action, properties, false);
+    public static void sendEvent(final String item, final String action, final String... properties) {
+        final Map<String, String> props = new HashMap<>();
+        for (int i = 1; i < properties.length; i += 2) {
+            props.put(properties[i - 1], properties[i]);
+        }
+        sendEvent(item, action, props, false);
     }
 
     public static void sendEvent(final String item, final String action, final Map<String, String> properties, final boolean force) {
