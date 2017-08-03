@@ -20,6 +20,7 @@ public class AppInsightsConstants {
     public static final String PLUGIN = "Plugin";
     public static final String RESTART = "Restart";
     public static final String LOAD= "Load";
+    public static final String PING= "Ping";
 
     // items or properties related to Azure
     public static final String AZURE_SUBSCRIPTION_ID = "SubscriptionId";
