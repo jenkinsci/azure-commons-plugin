@@ -18,11 +18,11 @@ public class UsernamePrivateKeyAuth extends UsernameAuth {
     private final Secret passPhrase;
     private final ImmutableList<String> privateKeys;
 
-    public UsernamePrivateKeyAuth(final String username, final Secret passPhrase, String... privateKeys) {
+    public UsernamePrivateKeyAuth(String username, Secret passPhrase, String... privateKeys) {
         this(username, passPhrase, Arrays.asList(privateKeys));
     }
 
-    public UsernamePrivateKeyAuth(final String username, final Secret passPhrase, Iterable privateKeys) {
+    public UsernamePrivateKeyAuth(String username, Secret passPhrase, Iterable privateKeys) {
         super(username);
         this.passPhrase = passPhrase;
         //noinspection unchecked

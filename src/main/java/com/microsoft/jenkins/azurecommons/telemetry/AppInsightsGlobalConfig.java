@@ -41,7 +41,7 @@ public final class AppInsightsGlobalConfig extends GlobalConfiguration {
     }
 
     @Override
-    public boolean configure(final StaplerRequest req, final JSONObject formData) throws FormException {
+    public boolean configure(StaplerRequest req, JSONObject formData) throws FormException {
         // send events to AppInsights in case config updated.
         // it's mandatory since we want to know the AI is explicitly enabled/disabled by user.
         boolean newValue = formData.getBoolean("appInsightsEnabled");
@@ -61,7 +61,7 @@ public final class AppInsightsGlobalConfig extends GlobalConfiguration {
         return appInsightsEnabled;
     }
 
-    public void setAppInsightsEnabled(final boolean appInsightsEnabled) {
+    public void setAppInsightsEnabled(boolean appInsightsEnabled) {
         this.appInsightsEnabled = appInsightsEnabled;
     }
 

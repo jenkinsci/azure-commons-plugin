@@ -12,11 +12,11 @@ import jenkins.model.Jenkins;
 import java.util.HashMap;
 import java.util.Map;
 
-public class AppInsightsClientFactory {
+public final class AppInsightsClientFactory {
     private static Map<Class<? extends Plugin>, AppInsightsClient> appInsightsClientMap = new HashMap<>();
     private static Object lock = new Object();
 
-    public static AppInsightsClient getInstance(final Class<? extends Plugin> clazz) {
+    public static AppInsightsClient getInstance(Class<? extends Plugin> clazz) {
         if (!appInsightsClientMap.containsKey(clazz)) {
             synchronized (lock) {
                 if (!appInsightsClientMap.containsKey(clazz)) {
@@ -34,5 +34,9 @@ public class AppInsightsClientFactory {
         }
 
         return appInsightsClientMap.get(clazz);
+    }
+
+    private AppInsightsClientFactory() {
+        // hide constructor
     }
 }

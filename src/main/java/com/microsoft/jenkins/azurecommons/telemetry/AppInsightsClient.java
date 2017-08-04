@@ -11,9 +11,7 @@ import com.microsoft.applicationinsights.TelemetryClient;
 import hudson.Plugin;
 import hudson.model.Computer;
 import hudson.node_monitors.ArchitectureMonitor;
-import hudson.util.VersionNumber;
 import jenkins.model.Jenkins;
-import net.sf.json.JSONObject;
 import org.apache.commons.lang.StringUtils;
 
 import java.util.HashMap;
@@ -36,19 +34,19 @@ public class AppInsightsClient {
     private final Plugin plugin;
     private TelemetryClient telemetryClient;
 
-    public AppInsightsClient(final Plugin plugin) {
+    public AppInsightsClient(Plugin plugin) {
         this.plugin = plugin;
     }
 
-    public void sendEvent(final String item, final String action, final Map<String, String> properties, final boolean force) {
+    public void sendEvent(String item, String action, Map<String, String> properties, boolean force) {
         try {
             if (this.plugin != null && (AppInsightsGlobalConfig.get().isAppInsightsEnabled() || force)) {
                 final String eventName = buildEventName(item, action);
                 final Map<String, String> formalizedProperties = formalizeProperties(properties);
 
-                final TelemetryClient telemetryClient = getTelemetryClient();
-                telemetryClient.trackEvent(eventName, formalizedProperties, null);
-                telemetryClient.flush();
+                final TelemetryClient client = getTelemetryClient();
+                client.trackEvent(eventName, formalizedProperties, null);
+                client.flush();
                 LOGGER.info("AI: " + eventName);
             }
         } catch (Exception e) {
@@ -59,18 +57,18 @@ public class AppInsightsClient {
     /*
        Override instrumentationKey() if you are connecting to another AI.
     */
-    public AppInsightsClient withInstrumentationKey(final String instrumentationKey) {
-        checkNotNull(instrumentationKey, "Parameter instrumentationKey is null.");
-        this.instrumentationKey = instrumentationKey;
+    public AppInsightsClient withInstrumentationKey(String key) {
+        checkNotNull(key, "Parameter instrumentation key is null.");
+        this.instrumentationKey = key;
         if (telemetryClient != null) {
-            telemetryClient.getContext().setInstrumentationKey(instrumentationKey);
+            telemetryClient.getContext().setInstrumentationKey(key);
         }
         return this;
     }
 
-    public AppInsightsClient withEventNamePrefix(final String eventNamePrefix) {
-        checkNotNull(eventNamePrefix, "Parameter event name is null.");
-        this.eventNamePrefix = eventNamePrefix;
+    public AppInsightsClient withEventNamePrefix(String prefix) {
+        checkNotNull(prefix, "Parameter event name prefix is null.");
+        this.eventNamePrefix = prefix;
         return this;
     }
 
@@ -85,31 +83,34 @@ public class AppInsightsClient {
         return telemetryClient;
     }
 
-    private String buildEventName(final String item, final String action) {
+    private String buildEventName(String item, String action) {
         final StringBuilder stringBuilder = new StringBuilder();
 
         stringBuilder.append(eventNamePrefix)
                 .append(AppInsightsConstants.EVENT_NAME_SEPARATOR).append(plugin.getWrapper().getShortName());
 
-        if (StringUtils.isNotBlank(item))
+        if (StringUtils.isNotBlank(item)) {
             stringBuilder.append(AppInsightsConstants.EVENT_NAME_SEPARATOR).append(item);
+        }
 
-        if (StringUtils.isNotBlank(action))
+        if (StringUtils.isNotBlank(action)) {
             stringBuilder.append(AppInsightsConstants.EVENT_NAME_SEPARATOR).append(action);
+        }
 
         return stringBuilder.toString();
     }
 
     private Map<String, String> formalizeProperties(Map<String, String> properties) {
-        if (properties == null)
+        if (properties == null) {
             properties = new HashMap<>();
+        }
 
         putJenkinsInfo(properties);
         properties.put(AppInsightsConstants.PROP_PLUGIN_NAME, plugin.getWrapper().getDisplayName());
         properties.put(AppInsightsConstants.PROP_PLUGIN_VERSION, plugin.getWrapper().getVersion());
 
         // Telemetry client doesn't accept null value for ConcurrentHashMap doesn't accept null key or null value.
-        for (final Iterator<Map.Entry<String, String>> iter = properties.entrySet().iterator(); iter.hasNext(); ) {
+        for (Iterator<Map.Entry<String, String>> iter = properties.entrySet().iterator(); iter.hasNext(); ) {
             final Map.Entry<String, String> entry = iter.next();
             if (StringUtils.isBlank(entry.getKey()) || StringUtils.isBlank(entry.getValue())) {
                 iter.remove();
@@ -136,7 +137,8 @@ public class AppInsightsClient {
                 properties.put("jvm-name", System.getProperty("java.vm.name"));
                 properties.put("jvm-version", System.getProperty("java.version"));
             }
-            ArchitectureMonitor.DescriptorImpl descriptor = j.getDescriptorByType(ArchitectureMonitor.DescriptorImpl.class);
+            ArchitectureMonitor.DescriptorImpl descriptor =
+                    j.getDescriptorByType(ArchitectureMonitor.DescriptorImpl.class);
             properties.put("os", descriptor.get(c));
         }
     }

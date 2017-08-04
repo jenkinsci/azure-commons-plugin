@@ -13,7 +13,7 @@ import com.cloudbees.plugins.credentials.common.StandardUsernamePasswordCredenti
  * Abstract SSH authentication credentials with username.
  */
 public abstract class UsernameAuth {
-    protected final String username;
+    private final String username;
 
     public UsernameAuth(String username) {
         this.username = username;

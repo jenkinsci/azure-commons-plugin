@@ -5,9 +5,7 @@
 
 package com.microsoft.jenkins.azurecommons.remote;
 
-import com.cloudbees.jenkins.plugins.sshcredentials.SSHUserPrivateKey;
 import com.cloudbees.plugins.credentials.common.StandardUsernameCredentials;
-import com.cloudbees.plugins.credentials.common.StandardUsernamePasswordCredentials;
 import com.jcraft.jsch.ChannelExec;
 import com.jcraft.jsch.ChannelSftp;
 import com.jcraft.jsch.JSch;
@@ -15,8 +13,8 @@ import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
 import com.jcraft.jsch.SftpException;
 import com.microsoft.jenkins.azurecommons.Constants;
+import com.microsoft.jenkins.azurecommons.Messages;
 import hudson.util.Secret;
-import org.jenkinsci.plugins.azurecommons.Messages;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -40,28 +38,17 @@ public class SSHClient implements AutoCloseable {
 
     private PrintStream logger;
 
-    public SSHClient(
-            final String host,
-            final int port,
-            final String username,
-            final String password) throws JSchException {
+    public SSHClient(String host, int port, String username, String password) throws JSchException {
         this(host, port, new UsernamePasswordAuth(username, password));
     }
 
     public SSHClient(
-            final String host,
-            final int port,
-            final String username,
-            final Secret passPhrase,
-            final String... privateKeys) throws JSchException {
+            String host, int port, String username, Secret passPhrase, String... privateKeys) throws JSchException {
         this(host, port, new UsernamePrivateKeyAuth(username, passPhrase, privateKeys));
     }
 
 
-    public SSHClient(
-            final String host,
-            final int port,
-            final StandardUsernameCredentials credentials) throws JSchException {
+    public SSHClient(String host, int port, StandardUsernameCredentials credentials) throws JSchException {
         this(host, port, UsernameAuth.fromCredentials(credentials));
     }
 
@@ -70,8 +57,8 @@ public class SSHClient implements AutoCloseable {
      * <p>
      * The credentials can be one of the two:
      * <ul>
-     * <li>{@link SSHUserPrivateKey} with username and SSH private key.</li>
-     * <li>Implementation of {@link StandardUsernamePasswordCredentials} with username and password.</li>
+     * <li>{@link UsernamePrivateKeyAuth} with username and SSH private key.</li>
+     * <li>Implementation of {@link UsernamePasswordAuth} with username and password.</li>
      * </ul>
      *
      * @param host the SSH server name or IP address.
@@ -79,10 +66,7 @@ public class SSHClient implements AutoCloseable {
      * @param auth the SSH authentication credentials.
      * @throws JSchException if the passed in parameters are not valid, e.g., null username
      */
-    public SSHClient(
-            final String host,
-            final int port,
-            final UsernameAuth auth) throws JSchException {
+    public SSHClient(String host, int port, UsernameAuth auth) throws JSchException {
         this.host = host;
         this.port = port;
 
@@ -158,7 +142,7 @@ public class SSHClient implements AutoCloseable {
         log(Messages.SSHClient_copyFileTo(sourceFile, host, remotePath));
         withChannelSftp(new ChannelSftpConsumer() {
             @Override
-            public void apply(final ChannelSftp channel) throws JSchException, SftpException {
+            public void apply(ChannelSftp channel) throws JSchException, SftpException {
                 channel.put(sourceFile.getAbsolutePath(), remotePath);
             }
         });
@@ -175,7 +159,7 @@ public class SSHClient implements AutoCloseable {
         try {
             withChannelSftp(new ChannelSftpConsumer() {
                 @Override
-                public void apply(final ChannelSftp channel) throws JSchException, SftpException {
+                public void apply(ChannelSftp channel) throws JSchException, SftpException {
                     channel.put(in, remotePath);
                 }
             });
@@ -199,7 +183,7 @@ public class SSHClient implements AutoCloseable {
         log(Messages.SSHClient_copyFileFrom(host, remotePath, destFile));
         withChannelSftp(new ChannelSftpConsumer() {
             @Override
-            public void apply(final ChannelSftp channel) throws JSchException, SftpException {
+            public void apply(ChannelSftp channel) throws JSchException, SftpException {
                 channel.get(remotePath, destFile.getAbsolutePath());
             }
         });
@@ -215,13 +199,13 @@ public class SSHClient implements AutoCloseable {
     public void copyFrom(final String remotePath, final OutputStream out) throws JSchException {
         withChannelSftp(new ChannelSftpConsumer() {
             @Override
-            public void apply(final ChannelSftp channel) throws JSchException, SftpException {
+            public void apply(ChannelSftp channel) throws JSchException, SftpException {
                 channel.get(remotePath, out);
             }
         });
     }
 
-    protected void withChannelSftp(final ChannelSftpConsumer consumer) throws JSchException {
+    protected void withChannelSftp(ChannelSftpConsumer consumer) throws JSchException {
         ChannelSftp channel = null;
         try {
             channel = (ChannelSftp) session.openChannel("sftp");
@@ -246,13 +230,13 @@ public class SSHClient implements AutoCloseable {
      * @throws JSchException if the underlying SSH session fails.
      * @throws IOException   if it fails to read the output from the remote channel.
      */
-    public String execRemote(final String command) throws JSchException, IOException, ExitStatusException {
+    public String execRemote(String command) throws JSchException, IOException, ExitStatusException {
         return execRemote(command, true, true);
     }
 
-    public String execRemote(final String command,
-                             final boolean showCommand,
-                             final boolean capture) throws JSchException, IOException, ExitStatusException {
+    public String execRemote(String command,
+                             boolean showCommand,
+                             boolean capture) throws JSchException, IOException, ExitStatusException {
         ChannelExec channel = null;
         try {
 
@@ -277,7 +261,8 @@ public class SSHClient implements AutoCloseable {
             if (!capture) {
                 while (!channel.isClosed()) {
                     try {
-                        Thread.sleep(200);
+                        final int waitPeriod = 200;
+                        Thread.sleep(waitPeriod);
                     } catch (InterruptedException e) {
                         Thread.currentThread().interrupt();
                         throw new JSchException("", e);
@@ -338,7 +323,7 @@ public class SSHClient implements AutoCloseable {
      * @return A new SSH client to the target host through the current SSH client.
      * @throws JSchException if error occurs during the SSH operations.
      */
-    public SSHClient forwardSSH(final String remoteHost, final int remotePort) throws JSchException {
+    public SSHClient forwardSSH(String remoteHost, int remotePort) throws JSchException {
         return forwardSSH(remoteHost, remotePort, credentials);
     }
 
@@ -368,8 +353,7 @@ public class SSHClient implements AutoCloseable {
      * @return A new SSH client to the target host through the current SSH client.
      * @throws JSchException if error occurs during the SSH operations.
      */
-    public SSHClient forwardSSH(final String remoteHost, final int remotePort,
-                                final UsernameAuth sshCredentials) throws JSchException {
+    public SSHClient forwardSSH(String remoteHost, int remotePort, UsernameAuth sshCredentials) throws JSchException {
         int localPort = session.setPortForwardingL(0, remoteHost, remotePort);
         return new SSHClient("127.0.0.1", localPort, sshCredentials).withLogger(logger);
     }
@@ -398,7 +382,7 @@ public class SSHClient implements AutoCloseable {
         }
     }
 
-    private void log(final String message) {
+    private void log(String message) {
         if (logger != null) {
             logger.println(message);
         }

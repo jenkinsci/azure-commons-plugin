@@ -27,13 +27,13 @@ public class AzureHttpRecorder {
     static final String RESPONSE_CODE = "httpCode";
     static final String RESPONSE_MESSAGE = "httpMessage";
 
-    final AppInsightsClient appInsightsClient;
+    private final AppInsightsClient appInsightsClient;
 
-    public AzureHttpRecorder(final AppInsightsClient client) {
+    public AzureHttpRecorder(AppInsightsClient client) {
         this.appInsightsClient = client;
     }
 
-    public void record(final HttpRecordable recordable) throws IOException {
+    public void record(HttpRecordable recordable) throws IOException {
         if (appInsightsClient != null) {
             try {
                 sendTelemetry(recordable);
@@ -43,7 +43,11 @@ public class AzureHttpRecorder {
         }
     }
 
-    private void sendTelemetry(final HttpRecordable recordable) {
+    public AppInsightsClient getAppInsightsClient() {
+        return appInsightsClient;
+    }
+
+    private void sendTelemetry(HttpRecordable recordable) {
         final Map<String, String> properties = new HashMap<>();
         final HttpUrl httpUrl = HttpUrl.get(recordable.getRequestUri());
         final String objectName = parseProvider(httpUrl, properties);
@@ -60,7 +64,7 @@ public class AzureHttpRecorder {
         appInsightsClient.sendEvent(AppInsightsConstants.AZURE_REST, recordable.getHttpMethod(), properties, false);
     }
 
-    private String parseProvider(final HttpUrl httpUrl, final Map<String, String> properties) {
+    private String parseProvider(HttpUrl httpUrl, Map<String, String> properties) {
         if (httpUrl.pathSegments().contains(PROVIDERS)) {
             int index = httpUrl.pathSegments().indexOf(PROVIDERS);
             if (index + 1 < httpUrl.pathSegments().size()) {
@@ -72,11 +76,12 @@ public class AzureHttpRecorder {
         return null;
     }
 
-    private void parseSubscriptionId(final HttpUrl httpUrl, final Map<String, String> properties) {
+    private void parseSubscriptionId(HttpUrl httpUrl, Map<String, String> properties) {
         if (httpUrl.pathSegments().contains(SUBSCRIPTIONS)) {
             int index = httpUrl.pathSegments().indexOf(SUBSCRIPTIONS);
-            if (index + 1 < httpUrl.pathSegments().size())
+            if (index + 1 < httpUrl.pathSegments().size()) {
                 properties.put(AppInsightsConstants.AZURE_SUBSCRIPTION_ID, httpUrl.pathSegments().get(index + 1));
+            }
         }
     }
 
@@ -97,9 +102,9 @@ public class AzureHttpRecorder {
             return requestUri;
         }
 
-        public HttpRecordable withRequestUri(final URI requestUri) {
-            checkNotNull(requestUri);
-            this.requestUri = requestUri;
+        public HttpRecordable withRequestUri(URI uri) {
+            checkNotNull(uri);
+            this.requestUri = uri;
             return this;
         }
 
@@ -107,9 +112,9 @@ public class AzureHttpRecorder {
             return httpMethod;
         }
 
-        public HttpRecordable withHttpMethod(final String httpMethod) {
-            checkNotNull(httpMethod);
-            this.httpMethod = httpMethod;
+        public HttpRecordable withHttpMethod(String method) {
+            checkNotNull(method);
+            this.httpMethod = method;
             return this;
         }
 
@@ -117,8 +122,8 @@ public class AzureHttpRecorder {
             return httpCode;
         }
 
-        public HttpRecordable withHttpCode(final int httpCode) {
-            this.httpCode = httpCode;
+        public HttpRecordable withHttpCode(int code) {
+            this.httpCode = code;
             return this;
         }
 
@@ -126,8 +131,8 @@ public class AzureHttpRecorder {
             return httpMessage;
         }
 
-        public HttpRecordable withHttpMessage(final String httpMessage) {
-            this.httpMessage = httpMessage;
+        public HttpRecordable withHttpMessage(String message) {
+            this.httpMessage = message;
             return this;
         }
 
@@ -135,8 +140,8 @@ public class AzureHttpRecorder {
             return requestId;
         }
 
-        public HttpRecordable withRequestId(final String requestId) {
-            this.requestId = requestId;
+        public HttpRecordable withRequestId(String id) {
+            this.requestId = id;
             return this;
         }
 
@@ -144,7 +149,7 @@ public class AzureHttpRecorder {
             return extraProperties;
         }
 
-        public HttpRecordable withExtraProperty(final String name, final String value) {
+        public HttpRecordable withExtraProperty(String name, String value) {
             this.extraProperties.put(name, value);
             return this;
         }

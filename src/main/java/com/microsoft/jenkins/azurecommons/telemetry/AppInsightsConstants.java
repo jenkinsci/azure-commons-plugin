@@ -6,7 +6,7 @@
 
 package com.microsoft.jenkins.azurecommons.telemetry;
 
-public class AppInsightsConstants {
+public final class AppInsightsConstants {
     // AI event prefix
     public static final String DEFAULT_EVENT_PREFIX = "AzureJenkinsPlugin";
     public static final String EVENT_NAME_SEPARATOR = ".";
@@ -19,8 +19,8 @@ public class AppInsightsConstants {
     public static final String JENKINS = "Jenkins";
     public static final String PLUGIN = "Plugin";
     public static final String RESTART = "Restart";
-    public static final String LOAD= "Load";
-    public static final String PING= "Ping";
+    public static final String LOAD = "Load";
+    public static final String PING = "Ping";
 
     // items or properties related to Azure
     public static final String AZURE_SUBSCRIPTION_ID = "SubscriptionId";
@@ -32,4 +32,8 @@ public class AppInsightsConstants {
     public static final String AZURE_CONTAINER_SERVICE = "AzureContainerService";
 
     public static final String DOCKER = "Docker";
+
+    private AppInsightsConstants() {
+        // hide constructor
+    }
 }
