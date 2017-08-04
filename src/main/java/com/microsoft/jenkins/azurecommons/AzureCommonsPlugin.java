@@ -13,7 +13,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class AzureCommonsPlugin extends Plugin {
-    public static void sendEvent(final String item, final String action, final String... properties) {
+    public static void sendEvent(String item, String action, String... properties) {
         final Map<String, String> props = new HashMap<>();
         for (int i = 1; i < properties.length; i += 2) {
             props.put(properties[i - 1], properties[i]);
@@ -21,7 +21,7 @@ public class AzureCommonsPlugin extends Plugin {
         sendEvent(item, action, props, false);
     }
 
-    public static void sendEvent(final String item, final String action, final Map<String, String> properties, final boolean force) {
+    public static void sendEvent(String item, String action, Map<String, String> properties, boolean force) {
         AppInsightsClientFactory.getInstance(AzureCommonsPlugin.class)
                 .sendEvent(item, action, properties, force);
     }

@@ -17,7 +17,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-public class EnvironmentInjector {
+public final class EnvironmentInjector {
     /**
      * Add an environment variable binding for the given Run.
      * <p>
@@ -92,5 +92,9 @@ public class EnvironmentInjector {
         public String getUrlName() {
             return null;
         }
+    }
+
+    private EnvironmentInjector() {
+        // hide constructor
     }
 }

@@ -13,7 +13,7 @@ import hudson.util.Secret;
 public class UsernamePasswordAuth extends UsernameAuth {
     private final Secret password;
 
-    public UsernamePasswordAuth(final String username, final String password) {
+    public UsernamePasswordAuth(String username, String password) {
         super(username);
         this.password = Secret.fromString(password);
     }
