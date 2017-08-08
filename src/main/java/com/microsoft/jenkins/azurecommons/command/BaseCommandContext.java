@@ -15,9 +15,13 @@ import org.jenkinsci.plugins.workflow.steps.Step;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-public abstract class BaseCommandContext extends Step implements ICommandServiceData {
+/**
+ * A mixed abstract base class with both command data and command service data.
+ */
+public abstract class BaseCommandContext extends Step implements ICommandServiceData, IBaseCommandData {
     private transient JobContext jobContext;
     private transient CommandState commandState = CommandState.Unknown;
+    private transient CommandState lastCommandState = CommandState.Unknown;
     private transient CommandService commandService;
 
     protected void configure(
@@ -42,12 +46,24 @@ public abstract class BaseCommandContext extends Step implements ICommandService
     @Override
     public abstract IBaseCommandData getDataForCommand(ICommand command);
 
+    @Override
     public void setCommandState(CommandState commandState) {
         this.commandState = commandState;
     }
 
+    @Override
     public CommandState getCommandState() {
         return this.commandState;
+    }
+
+    @Override
+    public CommandState getLastCommandState() {
+        return lastCommandState;
+    }
+
+    @Override
+    public void setLastCommandState(CommandState lastCommandState) {
+        this.lastCommandState = lastCommandState;
     }
 
     @Override
@@ -55,32 +71,28 @@ public abstract class BaseCommandContext extends Step implements ICommandService
         return commandService;
     }
 
-    public boolean hasError() {
-        return this.commandState.equals(CommandState.HasError);
-    }
-
-    public boolean isFinished() {
-        return this.commandState.equals(CommandState.HasError)
-                || this.commandState.equals(CommandState.Done);
-    }
-
+    @Override
     public final JobContext getJobContext() {
         return jobContext;
     }
 
+    @Override
     public void logStatus(String status) {
         getJobContext().logger().println(status);
     }
 
+    @Override
     public void logError(Exception ex) {
         this.logError(Messages.errorPrefix(), ex);
     }
 
+    @Override
     public void logError(String prefix, Exception ex) {
         ex.printStackTrace(getJobContext().getTaskListener().error(prefix + ex.getMessage()));
         setCommandState(CommandState.HasError);
     }
 
+    @Override
     public void logError(String message) {
         getJobContext().getTaskListener().error(message);
         setCommandState(CommandState.HasError);

@@ -71,6 +71,7 @@ public final class CommandService {
         Class current = startCommand;
         while (current != null) {
             final CommandState state = runCommand(current, commandServiceData);
+            commandServiceData.setLastCommandState(state);
 
             switch (state) {
                 case Success:

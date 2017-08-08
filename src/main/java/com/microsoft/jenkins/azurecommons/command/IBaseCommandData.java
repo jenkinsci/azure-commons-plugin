@@ -16,9 +16,19 @@ public interface IBaseCommandData {
 
     void logError(String prefix, Exception ex);
 
-    void setCommandState(CommandState deployState);
+    /**
+     * Set the command state for the associated running command.
+     *
+     * @param state the result command state.
+     */
+    void setCommandState(CommandState state);
+
+    /**
+     * Get the command state for the associated completed command.
+     *
+     * @return the result command state.
+     */
+    CommandState getCommandState();
 
     JobContext getJobContext();
-
-    CommandState getCommandState();
 }

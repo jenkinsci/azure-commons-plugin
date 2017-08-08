@@ -9,5 +9,13 @@ public enum CommandState {
     Unknown,
     Done,
     HasError,
-    Success
+    Success;
+
+    public boolean isFinished() {
+        return this == HasError || this == Done;
+    }
+
+    public boolean isError() {
+        return this == HasError;
+    }
 }
