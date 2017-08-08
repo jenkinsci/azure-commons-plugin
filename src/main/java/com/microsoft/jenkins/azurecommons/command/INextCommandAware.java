@@ -9,7 +9,5 @@ package com.microsoft.jenkins.azurecommons.command;
  * Indicates that a command is aware of its next command to be executed based on its execution status.
  */
 public interface INextCommandAware {
-    Class getSuccess();
-
-    Class getFail();
+    Class nextCommand();
 }

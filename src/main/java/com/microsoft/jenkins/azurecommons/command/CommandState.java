@@ -9,7 +9,5 @@ public enum CommandState {
     Unknown,
     Done,
     HasError,
-    Running,
-    Success,
-    UnSuccessful,
+    Success
 }

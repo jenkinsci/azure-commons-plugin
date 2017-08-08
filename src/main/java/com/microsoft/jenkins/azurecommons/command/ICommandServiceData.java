@@ -5,12 +5,8 @@
 
 package com.microsoft.jenkins.azurecommons.command;
 
-import java.util.Map;
-
 public interface ICommandServiceData {
-    Class getStartCommandClass();
-
-    Map<Class, TransitionInfo> getCommands();
+    CommandService getCommandService();
 
     IBaseCommandData getDataForCommand(ICommand command);
 }

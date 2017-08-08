@@ -5,80 +5,180 @@
 
 package com.microsoft.jenkins.azurecommons.command;
 
+import java.util.HashMap;
 import java.util.Map;
 
-public class CommandService {
-    private final ICommand<IBaseCommandData> cleanUpCommand;
+import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
 
-    public CommandService() {
-        cleanUpCommand = null;
+/**
+ * State machine for command execution.
+ * <p>
+ * NB. Not fully type safe on generic types.
+ */
+@SuppressWarnings("unchecked")
+public final class CommandService {
+    private final Map<Class<? extends ICommand>, Class<? extends ICommand>> transitionMap;
+    private final Map<Class<? extends ICommand>, ICommand> instanceMap;
+    private final Class startCommand;
+    private final Class cleanUpCommand;
+
+    public static Builder builder() {
+        return new Builder();
     }
 
-    @SuppressWarnings("unchecked")
-    public CommandService(ICommand cleanUpCommand) {
+    private CommandService(Map<Class<? extends ICommand>, Class<? extends ICommand>> transitionMap,
+                           Map<Class<? extends ICommand>, ICommand> instanceMap,
+                           Class startCommand,
+                           Class cleanUpCommand) {
+        this.transitionMap = transitionMap;
+        this.instanceMap = instanceMap;
+        this.startCommand = startCommand;
         this.cleanUpCommand = cleanUpCommand;
+    }
+
+    public ICommand<IBaseCommandData> getCleanUpCommand() {
+        return instanceMap.get(cleanUpCommand);
     }
 
     /**
      * Executes the commands described by the given {@code commandServiceData}, and runs the clean up command if
      * present.
-     * <p>
-     * If the clean up is not required, try the static method {@link #executeCommands(ICommandServiceData)}.
      *
      * @param commandServiceData the service data that describes the commands state transitions.
-     * @return whether the commands are executed gracefully
      */
-    public boolean safeExecuteCommands(ICommandServiceData commandServiceData) {
+    public void executeCommands(ICommandServiceData commandServiceData) {
         try {
-            return executeCommands(commandServiceData);
+            execute(commandServiceData);
         } finally {
             if (cleanUpCommand != null) {
-                IBaseCommandData commandData = commandServiceData.getDataForCommand(cleanUpCommand);
-                cleanUpCommand.execute(commandData);
+                runCommand(cleanUpCommand, commandServiceData);
             }
         }
     }
 
-    public ICommand<IBaseCommandData> getCleanUpCommand() {
-        return cleanUpCommand;
+    private CommandState runCommand(Class<? extends ICommand> clazz, ICommandServiceData commandServiceData) {
+        checkNotNull(clazz);
+        ICommand<IBaseCommandData> command = ensureCreation(clazz, instanceMap);
+        checkNotNull(command);
+        IBaseCommandData commandData = commandServiceData.getDataForCommand(command);
+        command.execute(commandData);
+        return commandData.getCommandState();
     }
 
-    public static boolean executeCommands(ICommandServiceData commandServiceData) {
-        Class startCommand = commandServiceData.getStartCommandClass();
-        Map<Class, TransitionInfo> commands = commandServiceData.getCommands();
-        if (!commands.isEmpty() && startCommand != null) {
-            //successfully started
-            TransitionInfo current = commands.get(startCommand);
-            while (current != null) {
-                ICommand<IBaseCommandData> command = current.getCommand();
-                IBaseCommandData commandData = commandServiceData.getDataForCommand(command);
-                command.execute(commandData);
+    private void execute(ICommandServiceData commandServiceData) {
+        //successfully started
+        Class current = startCommand;
+        while (current != null) {
+            final CommandState state = runCommand(current, commandServiceData);
 
-                INextCommandAware previous;
-                // If the command itself is INextCommandAware, use it to determine the next command;
-                // otherwise check the transition from the service data.
-                // This is useful if we need to implement a command with if / switch semantics.
-                if (command instanceof INextCommandAware) {
-                    previous = (INextCommandAware) command;
-                } else {
-                    previous = current;
-                }
-
-                current = null;
-
-                final CommandState state = commandData.getCommandState();
-                if (state == CommandState.Success && previous.getSuccess() != null) {
-                    current = commands.get(previous.getSuccess());
-                } else if (state == CommandState.UnSuccessful && previous.getFail() != null) {
-                    current = commands.get(previous.getFail());
-                } else if (state == CommandState.HasError) {
-                    return false;
-                }
+            switch (state) {
+                case Success:
+                    if (INextCommandAware.class.isAssignableFrom(current)) {
+                        // If the command itself is INextCommandAware, use it to determine the next command;
+                        // otherwise check the transition from the service data.
+                        // This is useful if we need to implement a command with if / switch semantics.
+                        current = ((INextCommandAware) instanceMap.get(current)).nextCommand();
+                    } else {
+                        current = transitionMap.get(current);
+                    }
+                    break;
+                case HasError:
+                case Done:
+                    // we're done
+                    return;
+                default:
+                    // the command didn't set a meaningful state
+                    break;
             }
+        }
+    }
 
-            return true;
+    private static ICommand ensureCreation(Class<? extends ICommand> clazz,
+                                           Map<Class<? extends ICommand>, ICommand> cache) {
+        try {
+            ICommand command = cache.get(clazz);
+            if (command == null) {
+                command = clazz.newInstance();
+                cache.put(clazz, command);
+            }
+            return command;
+        } catch (Exception e) {
+            throw new IllegalArgumentException(e);
+        }
+    }
+
+    public static final class Builder {
+        private Map<Class<? extends ICommand>, Class<? extends ICommand>> transitionMap;
+        private Map<Class<? extends ICommand>, ICommand> instanceMap;
+        private Class<? extends ICommand> cleanUpCommand;
+        private Class<? extends ICommand> startCmd;
+
+        private Builder() {
+            transitionMap = new HashMap<>();
+            instanceMap = new HashMap<>();
         }
 
-        return false;
+        /**
+         * Register a transition from current command to the next command if current command is executed without error.
+         *
+         * @param current the current command
+         * @param next    the next command to be executed if current finishes successfully
+         * @return the builder itself
+         */
+        public Builder withTransition(Class<? extends ICommand<? extends IBaseCommandData>> current,
+                                      Class<? extends ICommand<? extends IBaseCommandData>> next) {
+            transitionMap.put(current, next);
+            ensureCreation(current, instanceMap);
+            ensureCreation(next, instanceMap);
+            return this;
+        }
+
+        /**
+         * Register the start command.
+         *
+         * @param command the start command.
+         * @return the builder itself
+         */
+        public Builder withStartCommand(Class<? extends ICommand<? extends IBaseCommandData>> command) {
+            checkNotNull(command);
+            this.startCmd = command;
+            ensureCreation(command, instanceMap);
+            return this;
+        }
+
+        /**
+         * Register an optional clean up command that will be executed when the all the normal commands finish
+         * execution, regardless of the termination state of the last command.
+         *
+         * @param command the clean up command
+         * @return the builder itself.
+         */
+        public Builder withCleanUpCommand(Class<? extends ICommand<? extends IBaseCommandData>> command) {
+            checkNotNull(command);
+            this.cleanUpCommand = command;
+            ensureCreation(command, instanceMap);
+            return this;
+        }
+
+        /**
+         * Register a single command that may be used by other transitions.
+         * <p>
+         * This ensures the command is instantiated early in the execution flow. It may be used for the followed
+         * commands of an {@link INextCommandAware} command, where the transition is defined by the command.
+         *
+         * @param command the command to be registered.
+         * @return the builder itself.
+         */
+        public Builder withSingleCommand(Class<? extends ICommand<? extends IBaseCommandData>> command) {
+            ensureCreation(command, instanceMap);
+            return this;
+        }
+
+        public CommandService build() {
+            checkState(!instanceMap.isEmpty());
+            checkNotNull(startCmd);
+            return new CommandService(transitionMap, instanceMap, startCmd, cleanUpCommand);
+        }
     }
 }

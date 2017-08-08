@@ -5,7 +5,6 @@
 
 package com.microsoft.jenkins.azurecommons.command;
 
-import com.google.common.collect.ImmutableMap;
 import com.microsoft.jenkins.azurecommons.JobContext;
 import com.microsoft.jenkins.azurecommons.Messages;
 import hudson.FilePath;
@@ -14,41 +13,30 @@ import hudson.model.Run;
 import hudson.model.TaskListener;
 import org.jenkinsci.plugins.workflow.steps.Step;
 
-import java.util.Hashtable;
-import java.util.Map;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 public abstract class BaseCommandContext extends Step implements ICommandServiceData {
     private transient JobContext jobContext;
     private transient CommandState commandState = CommandState.Unknown;
-    private transient Map<Class, TransitionInfo> commands;
-    private transient Class startCommandClass;
+    private transient CommandService commandService;
 
     protected void configure(
             Run<?, ?> aRun,
             FilePath aWorkspace,
             Launcher aLauncher,
             TaskListener aTaskListener,
-            Map<Class, TransitionInfo> cmds,
-            Class startCmd) {
-        this.jobContext = new JobContext(aRun, aWorkspace, aLauncher, aTaskListener);
-        this.commands = ImmutableMap.copyOf(cmds);
-        this.startCommandClass = startCmd;
+            CommandService aCommandService) {
+        configure(new JobContext(aRun, aWorkspace, aLauncher, aTaskListener), aCommandService);
     }
 
-    protected void configure(JobContext jobCtx, Hashtable<Class, TransitionInfo> cmds, Class startCmdClass) {
+    protected void configure(JobContext jobCtx, CommandService aCommandService) {
         this.jobContext = jobCtx;
-        this.commands = cmds;
-        this.startCommandClass = startCmdClass;
+        this.commandService = aCommandService;
     }
 
-    @Override
-    public Map<Class, TransitionInfo> getCommands() {
-        return commands;
-    }
-
-    @Override
-    public Class getStartCommandClass() {
-        return startCommandClass;
+    public void executeCommands() {
+        checkNotNull(commandService, "configure should be called prior to execution");
+        commandService.executeCommands(this);
     }
 
     @Override
@@ -62,6 +50,11 @@ public abstract class BaseCommandContext extends Step implements ICommandService
         return this.commandState;
     }
 
+    @Override
+    public CommandService getCommandService() {
+        return commandService;
+    }
+
     public boolean hasError() {
         return this.commandState.equals(CommandState.HasError);
     }
@@ -71,12 +64,12 @@ public abstract class BaseCommandContext extends Step implements ICommandService
                 || this.commandState.equals(CommandState.Done);
     }
 
-    public final JobContext jobContext() {
+    public final JobContext getJobContext() {
         return jobContext;
     }
 
     public void logStatus(String status) {
-        jobContext().getTaskListener().getLogger().println(status);
+        getJobContext().logger().println(status);
     }
 
     public void logError(Exception ex) {
@@ -84,12 +77,12 @@ public abstract class BaseCommandContext extends Step implements ICommandService
     }
 
     public void logError(String prefix, Exception ex) {
-        ex.printStackTrace(jobContext().getTaskListener().error(prefix + ex.getMessage()));
+        ex.printStackTrace(getJobContext().getTaskListener().error(prefix + ex.getMessage()));
         setCommandState(CommandState.HasError);
     }
 
     public void logError(String message) {
-        jobContext().getTaskListener().error(message);
+        getJobContext().getTaskListener().error(message);
         setCommandState(CommandState.HasError);
     }
 }

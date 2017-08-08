@@ -18,7 +18,7 @@ public interface IBaseCommandData {
 
     void setCommandState(CommandState deployState);
 
-    JobContext jobContext();
+    JobContext getJobContext();
 
     CommandState getCommandState();
 }
