@@ -113,7 +113,7 @@ public final class CommandService {
                     return;
                 default:
                     // the command didn't set a meaningful state
-                    break;
+                    throw new IllegalStateException("Command " + current.getSimpleName() + " didn't set command state");
             }
         }
     }
