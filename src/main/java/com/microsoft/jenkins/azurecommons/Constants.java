@@ -12,7 +12,7 @@ import java.nio.charset.Charset;
  */
 public final class Constants {
 
-    public static final Charset DEFAULT_CHARSET = Charset.forName("UTF-8");
+    public static final Charset UTF8 = Charset.forName("UTF-8");
 
     public static final int READ_BUFFER_SIZE = 4096;
 

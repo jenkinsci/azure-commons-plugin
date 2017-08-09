@@ -33,7 +33,7 @@ public class UsernamePrivateKeyAuth extends UsernameAuth {
         if (passPhrase == null) {
             return null;
         }
-        return passPhrase.getPlainText().getBytes(Constants.DEFAULT_CHARSET);
+        return passPhrase.getPlainText().getBytes(Constants.UTF8);
     }
 
     public ImmutableList<String> getPrivateKeys() {

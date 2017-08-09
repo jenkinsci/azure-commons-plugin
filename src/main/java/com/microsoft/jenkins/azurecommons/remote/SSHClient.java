@@ -82,7 +82,7 @@ public class SSHClient implements AutoCloseable {
                 if (seq++ != 0) {
                     name += "-" + seq;
                 }
-                jsch.addIdentity(name, privateKey.getBytes(Constants.DEFAULT_CHARSET), null, passphraseBytes);
+                jsch.addIdentity(name, privateKey.getBytes(Constants.UTF8), null, passphraseBytes);
             }
         }
     }
@@ -295,7 +295,7 @@ public class SSHClient implements AutoCloseable {
                 }
                 int exitCode = channel.getExitStatus();
                 log(Messages.SSHClient_commandExitStatus(exitCode));
-                String serverOutput = output.toString(Constants.DEFAULT_CHARSET.name());
+                String serverOutput = output.toString(Constants.UTF8.name());
                 log(Messages.SSHClient_output(serverOutput));
                 if (exitCode != 0) {
                     throw new ExitStatusException(exitCode, serverOutput);
