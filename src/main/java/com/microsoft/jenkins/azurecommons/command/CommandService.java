@@ -5,6 +5,9 @@
 
 package com.microsoft.jenkins.azurecommons.command;
 
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -39,6 +42,26 @@ public final class CommandService {
 
     public ICommand<IBaseCommandData> getCleanUpCommand() {
         return instanceMap.get(cleanUpCommand);
+    }
+
+    public Class getStartCommandClass() {
+        return startCommand;
+    }
+
+    public ImmutableMap<Class, Class> getTransitions() {
+        ImmutableMap.Builder<Class, Class> builder = ImmutableMap.builder();
+        for (Map.Entry<Class<? extends ICommand>, Class<? extends ICommand>> entry : transitionMap.entrySet()) {
+            builder.put(entry.getKey(), entry.getValue());
+        }
+        return builder.build();
+    }
+
+    public ImmutableSet<Class> getRegisteredCommands() {
+        ImmutableSet.Builder<Class> builder = ImmutableSet.builder();
+        for (Class<? extends ICommand> clazz : instanceMap.keySet()) {
+            builder.add(clazz);
+        }
+        return builder.build();
     }
 
     /**
