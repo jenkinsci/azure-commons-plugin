@@ -44,11 +44,6 @@ public class AppInsightsPluginLoadListener extends RestartListener {
         }
     }
 
-    @Extension
-    public static class AzurePluginItemListener extends ItemListener {
-
-    }
-
     private static boolean isMicrosoftPlugin(PluginWrapper wrapper) {
         final String pluginClass = wrapper.getPluginClass();
         // might includes plugins owned by other MS teams
