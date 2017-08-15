@@ -19,15 +19,16 @@ public class AppInsightsPageDecorator extends PageDecorator {
     /**
      * When was the last time we asked a browser to send the AI event for us.
      */
-    private volatile transient long lastAttempt = -1;
+    private transient volatile long lastAttempt = -1;
 
     /**
      * Returns true if it's time for us to check for new version.
      */
     public boolean isDue() {
         // user opted out. no data collection.
-        if (!AppInsightsGlobalConfig.get().isAppInsightsEnabled())
+        if (!AppInsightsGlobalConfig.get().isAppInsightsEnabled()) {
             return false;
+        }
 
         long now = System.currentTimeMillis();
         if (now - lastAttempt > DAY) {

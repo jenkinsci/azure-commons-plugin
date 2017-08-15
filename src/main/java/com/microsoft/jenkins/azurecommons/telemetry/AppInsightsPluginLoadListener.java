@@ -13,7 +13,6 @@ import hudson.PluginWrapper;
 import hudson.init.InitMilestone;
 import hudson.init.Initializer;
 import hudson.model.RestartListener;
-import hudson.model.listeners.ItemListener;
 import jenkins.model.Jenkins;
 
 import java.io.IOException;
@@ -34,8 +33,9 @@ public class AppInsightsPluginLoadListener extends RestartListener {
     public static void traceAzurePlugins(final Jenkins jenkins, final String action) {
         for (PluginWrapper wrapper : jenkins.getPluginManager().getPlugins()) {
             Plugin plugin = wrapper.getPlugin();
-            if (plugin == null)
+            if (plugin == null) {
                 continue;
+            }
 
             if (plugin instanceof AppInsightsRecordable || isMicrosoftPlugin(wrapper)) {
                 AppInsightsClient client = AppInsightsClientFactory.getInstance(plugin.getClass());

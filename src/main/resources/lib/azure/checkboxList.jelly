@@ -1,0 +1,59 @@
+<!--
+  ~ Copyright (c) Microsoft Corporation. All rights reserved.
+  ~ Licensed under the MIT License. See LICENSE in the project root for license information.
+  -->
+
+<?jelly escape-by-default="true"?>
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:f="/lib/form">
+    <st:documentation><![CDATA[
+        A list of checkbox items that supports multiple selection and dynamic items loading.
+
+        Methods required for the control to work properly:
+        1. the getter method for the field on the instance
+        2. the getter method with "Json" suffix (i.e., get{Field}Json()) that returns the JSON representation of the
+           value returned from the getter method.
+        3. The doFill{Field}Items method on the descriptor that returns ListBoxModel. The option name will be displayed
+           as the label, and the option value will be passed back as the list values on save.
+
+        Note that if a value is not selected, an empty String will be passed back in the list. In the setter method of
+        the field, you should filter out the empty values.
+        ]]>
+        <st:attribute name="clazz">
+            Additional CSS classes that the control gets.
+        </st:attribute>
+        <st:attribute name="field">
+            Used for data binding.
+        </st:attribute>
+        <st:attribute name="value">
+            Currently selected list values in JSON format.
+        </st:attribute>
+        <st:attribute name="default">
+            Default selected list values in JSON format.
+        </st:attribute>
+    </st:documentation>
+    <f:prepareDatabinding/>
+    <st:adjunct includes="lib.azure.checkboxList.checkboxList"/>
+
+    <j:set var="storedValue" value="${instance[attrs.field]}"/>
+    <j:set var="value" value="${attrs.value ?: instance[attrs.field + 'Json'] ?: attrs.default ?: '[]'}"/>
+    ${descriptor.calcFillSettings(field,attrs)} <!-- this figures out the 'fillUrl' and 'fillDependsOn' attribute -->
+    <m:div xmlns:m="jelly:hudson.util.jelly.MorphTagLibrary"
+           class="${attrs.checkUrl!=null?'validated':''} azure-checkbox-list ${attrs.clazz}"
+           data-value="${value}"
+           data-name="${'_.'+attrs.field}"
+           ATTRIBUTES="${attrs}" EXCEPT="field clazz value default">
+        <j:if test="${empty(storedValue)}">
+            No choices available.
+        </j:if>
+        <j:if test="${!empty(storedValue)}">
+            <j:forEach var="item" items="${storedValue}">
+                <div>
+                    <label><input type="checkbox" name="${'_.'+attrs.field+'_check'}" value="${item}" checked="checked"/>
+                        ${item}
+                    </label>
+                    <input type="hidden" name="${'_.'+attrs.field}" value="${item}" data-value="${item}"/>
+                </div>
+            </j:forEach>
+        </j:if>
+    </m:div>
+</j:jelly>
