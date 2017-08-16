@@ -20,6 +20,7 @@ public final class AppInsightsGlobalConfig extends GlobalConfiguration {
     private boolean appInsightsEnabled = true;
 
     public AppInsightsGlobalConfig() {
+        load();
     }
 
     @DataBoundConstructor
