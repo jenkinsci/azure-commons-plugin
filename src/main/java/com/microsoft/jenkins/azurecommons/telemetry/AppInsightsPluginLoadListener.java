@@ -13,7 +13,6 @@ import hudson.PluginWrapper;
 import hudson.init.InitMilestone;
 import hudson.init.Initializer;
 import hudson.model.RestartListener;
-import hudson.model.listeners.ItemListener;
 import jenkins.model.Jenkins;
 
 import java.io.IOException;
@@ -43,11 +42,6 @@ public class AppInsightsPluginLoadListener extends RestartListener {
                 client.sendEvent(AppInsightsConstants.PLUGIN, action, null, false);
             }
         }
-    }
-
-    @Extension
-    public static class AzurePluginItemListener extends ItemListener {
-
     }
 
     private static boolean isMicrosoftPlugin(PluginWrapper wrapper) {
