@@ -8,6 +8,7 @@ package com.microsoft.jenkins.azurecommons.command;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.microsoft.jenkins.azurecommons.JobContext;
+import hudson.EnvVars;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.invocation.InvocationOnMock;
@@ -247,6 +248,11 @@ public class CommandServiceTest {
         @Override
         public CommandState getCommandState() {
             return commandState;
+        }
+
+        @Override
+        public EnvVars getEnvVars() {
+            return jobContext.envVars();
         }
     }
 }

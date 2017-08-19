@@ -6,6 +6,7 @@
 package com.microsoft.jenkins.azurecommons.command;
 
 import com.google.common.collect.ImmutableSet;
+import hudson.EnvVars;
 import hudson.FilePath;
 import hudson.Launcher;
 import hudson.model.Run;
@@ -35,7 +36,7 @@ import javax.annotation.Nonnull;
  */
 public class SimpleBuildStepExecution extends SynchronousNonBlockingStepExecution<Void> {
     public static final ImmutableSet<? extends Class<?>> REQUIRED_CONTEXT =
-            ImmutableSet.of(Run.class, FilePath.class, Launcher.class, TaskListener.class);
+            ImmutableSet.of(Run.class, FilePath.class, Launcher.class, TaskListener.class, EnvVars.class);
 
     private static final long serialVersionUID = 1L;
 

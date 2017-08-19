@@ -6,6 +6,7 @@
 package com.microsoft.jenkins.azurecommons.command;
 
 import com.microsoft.jenkins.azurecommons.JobContext;
+import hudson.EnvVars;
 
 public interface IBaseCommandData {
     void logError(String message);
@@ -31,4 +32,12 @@ public interface IBaseCommandData {
     CommandState getCommandState();
 
     JobContext getJobContext();
+
+    /**
+     * To get the environment variable bindings, this method should be called in prefer to
+     * {@code getJobContext().envVars()}. In the pipeline environment, the environment variables returned from
+     * {@code getJobContext().envVars()} is not complete. The default implementation of this method in
+     * {@link BaseCommandContext} handles this.
+     */
+    EnvVars getEnvVars();
 }
