@@ -1,3 +1,9 @@
+/**
+ * Copyright (c) Microsoft Corporation. All rights reserved.
+ * Licensed under the MIT License. See License.txt in the project root for
+ * license information.
+ */
+
 package com.microsoft.jenkins.azurecommons.credentials;
 
 import com.auth0.jwt.JWT;
@@ -81,9 +87,9 @@ public class MsiTokenCredentials extends AzureTokenCredentials {
     private Token parseToken(String responseBody) throws IOException {
         Token token = mapper.readValue(responseBody, Token.class);
         if (token == null) {
-            throw new RuntimeException();
+            throw new RuntimeException("Failed to parse the response.");
         } else if (StringUtils.isEmpty(token.getAccessToken())) {
-            throw new RuntimeException();
+            throw new RuntimeException("The access token isn't included in the response.");
         } else {
             if (StringUtils.isEmpty(tenantId)) {
                 String rawJwt = token.getAccessToken();
