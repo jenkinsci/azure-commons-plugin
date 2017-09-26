@@ -140,6 +140,7 @@
                     <configLocation>checkstyle.xml</configLocation>
                     <encoding>UTF-8</encoding>
                     <consoleOutput>true</consoleOutput>
+                    <resourceIncludes>src/main/resources/**</resourceIncludes>
                 </configuration>
             </plugin>
         </plugins>
