@@ -22,9 +22,9 @@ import okhttp3.logging.HttpLoggingInterceptor;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 public class MsiTokenCredentials extends AzureTokenCredentials {
 
@@ -51,7 +51,7 @@ public class MsiTokenCredentials extends AzureTokenCredentials {
     @Override
     public synchronized String getToken(String resource) throws IOException {
         Token authenticationResult = tokens.get(resource);
-        if (authenticationResult == null || authenticationResult.getExpiresOn().before(new Date())) {
+        if (authenticationResult == null || authenticationResult.isExpired()) {
             authenticationResult = acquireAccessToken(resource);
             tokens.put(resource, authenticationResult);
         }
@@ -112,7 +112,7 @@ public class MsiTokenCredentials extends AzureTokenCredentials {
         private long expiresIn;
 
         @JsonProperty("expires_on")
-        private Date expiresOn;
+        private long expiresOn;
 
         @JsonProperty("access_token")
         private String accessToken;
@@ -126,7 +126,7 @@ public class MsiTokenCredentials extends AzureTokenCredentials {
         public Token() {
         }
 
-        public Token(String resource, long expiresIn, Date expiresOn,
+        public Token(String resource, long expiresIn, long expiresOn,
                       String accessToken, String refreshToken, String tokenType) {
             this.resource = resource;
             this.expiresIn = expiresIn;
@@ -144,7 +144,7 @@ public class MsiTokenCredentials extends AzureTokenCredentials {
             return expiresIn;
         }
 
-        public Date getExpiresOn() {
+        public long getExpiresOn() {
             return expiresOn;
         }
 
@@ -168,7 +168,7 @@ public class MsiTokenCredentials extends AzureTokenCredentials {
             this.expiresIn = expiresIn;
         }
 
-        public void setExpiresOn(Date expiresOn) {
+        public void setExpiresOn(long expiresOn) {
             this.expiresOn = expiresOn;
         }
 
@@ -182,6 +182,11 @@ public class MsiTokenCredentials extends AzureTokenCredentials {
 
         public void setTokenType(String tokenType) {
             this.tokenType = tokenType;
+        }
+
+        boolean isExpired() {
+            long now = TimeUnit.SECONDS.convert(System.currentTimeMillis(), TimeUnit.MILLISECONDS);
+            return expiresOn < now;
         }
     }
 }
