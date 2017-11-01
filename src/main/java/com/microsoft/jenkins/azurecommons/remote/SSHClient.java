@@ -44,7 +44,8 @@ public class SSHClient implements AutoCloseable {
 
     public SSHClient(
             String host, int port, String username, Secret passPhrase, String... privateKeys) throws JSchException {
-        this(host, port, new UsernamePrivateKeyAuth(username, passPhrase, privateKeys));
+        this(host, port, new UsernamePrivateKeyAuth(
+                username, passPhrase == null ? null : passPhrase.getPlainText(), privateKeys));
     }
 
 
@@ -125,7 +126,7 @@ public class SSHClient implements AutoCloseable {
         session.setConfig(config);
         if (credentials instanceof UsernamePasswordAuth) {
             session.setPassword(
-                    ((UsernamePasswordAuth) credentials).getPassword().getPlainText());
+                    ((UsernamePasswordAuth) credentials).getPassword());
         }
         session.connect();
         return this;

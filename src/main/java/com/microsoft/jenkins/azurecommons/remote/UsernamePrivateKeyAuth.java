@@ -7,7 +7,6 @@ package com.microsoft.jenkins.azurecommons.remote;
 
 import com.google.common.collect.ImmutableList;
 import com.microsoft.jenkins.azurecommons.Constants;
-import hudson.util.Secret;
 
 import java.util.Arrays;
 
@@ -15,14 +14,14 @@ import java.util.Arrays;
  * SSH authentication credentials with username and private keys.
  */
 public class UsernamePrivateKeyAuth extends UsernameAuth {
-    private final Secret passPhrase;
+    private final String passPhrase;
     private final ImmutableList<String> privateKeys;
 
-    public UsernamePrivateKeyAuth(String username, Secret passPhrase, String... privateKeys) {
+    public UsernamePrivateKeyAuth(String username, String passPhrase, String... privateKeys) {
         this(username, passPhrase, Arrays.asList(privateKeys));
     }
 
-    public UsernamePrivateKeyAuth(String username, Secret passPhrase, Iterable privateKeys) {
+    public UsernamePrivateKeyAuth(String username, String passPhrase, Iterable privateKeys) {
         super(username);
         this.passPhrase = passPhrase;
         //noinspection unchecked
@@ -33,7 +32,7 @@ public class UsernamePrivateKeyAuth extends UsernameAuth {
         if (passPhrase == null) {
             return null;
         }
-        return passPhrase.getPlainText().getBytes(Constants.UTF8);
+        return passPhrase.getBytes(Constants.UTF8);
     }
 
     public ImmutableList<String> getPrivateKeys() {
