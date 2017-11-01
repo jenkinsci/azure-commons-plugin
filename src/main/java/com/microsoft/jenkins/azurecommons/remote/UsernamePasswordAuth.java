@@ -18,6 +18,11 @@ public class UsernamePasswordAuth extends UsernameAuth {
         this.password = Secret.fromString(password);
     }
 
+    public UsernamePasswordAuth(String username,Secret password){
+        super(username);
+        this.password = password;
+    }
+
     public Secret getPassword() {
         return password;
     }
