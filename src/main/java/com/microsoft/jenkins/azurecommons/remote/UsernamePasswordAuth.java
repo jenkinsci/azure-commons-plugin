@@ -5,20 +5,18 @@
 
 package com.microsoft.jenkins.azurecommons.remote;
 
-import hudson.util.Secret;
-
 /**
  * SSH authentication credentials with username and password.
  */
-public class UsernamePasswordAuth extends UsernameAuth {
-    private final Secret password;
+class UsernamePasswordAuth extends UsernameAuth {
+    private final String password;
 
-    public UsernamePasswordAuth(String username, String password) {
+    UsernamePasswordAuth(String username, String password) {
         super(username);
-        this.password = Secret.fromString(password);
+        this.password = password;
     }
 
-    public Secret getPassword() {
+    String getPassword() {
         return password;
     }
 }
