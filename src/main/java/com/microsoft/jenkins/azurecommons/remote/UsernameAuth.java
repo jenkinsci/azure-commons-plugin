@@ -13,18 +13,18 @@ import hudson.util.Secret;
 /**
  * Abstract SSH authentication credentials with username.
  */
-public abstract class UsernameAuth {
+abstract class UsernameAuth {
     private final String username;
 
-    public UsernameAuth(String username) {
+    UsernameAuth(String username) {
         this.username = username;
     }
 
-    public String getUsername() {
+    String getUsername() {
         return username;
     }
 
-    public static UsernameAuth fromCredentials(StandardUsernameCredentials credentials) {
+    static UsernameAuth fromCredentials(StandardUsernameCredentials credentials) {
         if (credentials instanceof StandardUsernamePasswordCredentials) {
             StandardUsernamePasswordCredentials userPass = (StandardUsernamePasswordCredentials) credentials;
             return new UsernamePasswordAuth(userPass.getUsername(), userPass.getPassword().getPlainText());

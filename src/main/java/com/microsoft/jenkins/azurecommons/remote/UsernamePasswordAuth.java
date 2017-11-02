@@ -8,15 +8,15 @@ package com.microsoft.jenkins.azurecommons.remote;
 /**
  * SSH authentication credentials with username and password.
  */
-public class UsernamePasswordAuth extends UsernameAuth {
+class UsernamePasswordAuth extends UsernameAuth {
     private final String password;
 
-    public UsernamePasswordAuth(String username, String password) {
+    UsernamePasswordAuth(String username, String password) {
         super(username);
         this.password = password;
     }
 
-    public String getPassword() {
+    String getPassword() {
         return password;
     }
 }
