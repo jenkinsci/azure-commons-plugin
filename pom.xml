@@ -114,8 +114,11 @@
         </pluginManagement>
         <resources>
             <resource>
-                <directory>src/main/resources</directory>
+                <directory>src/main/ai-resources</directory>
                 <filtering>true</filtering>
+            </resource>
+            <resource>
+                <directory>src/main/resources</directory>
             </resource>
             <resource>
                 <directory>${project.basedir}</directory>
@@ -152,7 +155,10 @@
                     <configLocation>checkstyle.xml</configLocation>
                     <encoding>UTF-8</encoding>
                     <consoleOutput>true</consoleOutput>
-                    <resourceIncludes>src/main/resources/**</resourceIncludes>
+                    <resourceIncludes>
+                        src/main/resources/**
+                        src/main/ai-resources/**
+                    </resourceIncludes>
                 </configuration>
             </plugin>
         </plugins>
