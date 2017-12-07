@@ -40,6 +40,11 @@ THE SOFTWARE.
             Path to the inline help. See &lt;f:entry help="..." />
         </st:attribute>
     </st:documentation>
+    <j:if test="${attrs.help==null and attrs.name!=null}">
+        <!-- infer the help page from the current descriptor and field if possible -->
+        <j:set target="${attrs}" property="help"
+               value="${descriptor.getHelpFile(attrs.name)}" />
+    </j:if>
 
     <st:adjunct includes="lib.azure.dropdownList.dropdownList"/>
 
