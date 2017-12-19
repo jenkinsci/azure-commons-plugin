@@ -54,9 +54,9 @@ public final class AzureClientFactory {
         AzureEnvironment azureEnvironment = AzureEnvUtil.resolveAzureEnv(envName);
 
         AzureEnvUtil.resolveOverride(azureEnvironment,
-                AzureEnvironment.Endpoint.MANAGEMENT, token.getServiceManagementURL());
+                AzureEnvironment.Endpoint.MANAGEMENT, token.getManagementEndpoint());
         AzureEnvUtil.resolveOverride(azureEnvironment,
-                AzureEnvironment.Endpoint.ACTIVE_DIRECTORY, token.getAuthenticationEndpoint());
+                AzureEnvironment.Endpoint.ACTIVE_DIRECTORY, token.getActiveDirectoryEndpoint());
         AzureEnvUtil.resolveOverride(azureEnvironment,
                 AzureEnvironment.Endpoint.RESOURCE_MANAGER, token.getResourceManagerEndpoint());
         AzureEnvUtil.resolveOverride(azureEnvironment,
