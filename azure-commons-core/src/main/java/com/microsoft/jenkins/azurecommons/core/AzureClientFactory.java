@@ -67,14 +67,16 @@ public final class AzureClientFactory {
     @Nonnull
     public static Azure getClient(TokenCredentialData data) throws IOException {
         AzureEnvironment env = createAzureEnvironment(data);
-        if (data.getType() == 0) {
+        if (data.getType() == TokenCredentialData.TYPE_SP) {
             return getClient(data.getClientId(),
                     data.getClientSecret(),
                     data.getTenant(),
                     data.getSubscriptionId(),
                     env);
-        } else {
+        } else if (data.getType() == TokenCredentialData.TYPE_MSI) {
             return getClient(data.getMsiPort(), env);
+        } else {
+            throw new UnsupportedOperationException("Unknown data type: " + data.getType());
         }
     }
 

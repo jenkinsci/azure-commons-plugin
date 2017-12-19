@@ -7,6 +7,9 @@ import java.io.Serializable;
 public class TokenCredentialData implements Serializable {
     private static final long serialVersionUID = 1L;
 
+    public static final int TYPE_SP = 0;
+    public static final int TYPE_MSI = 1;
+
     private int type;
     private String azureEnvironmentName;
     private String serviceManagementURL;
