@@ -12,8 +12,8 @@ public class TokenCredentialData implements Serializable {
 
     private int type;
     private String azureEnvironmentName;
-    private String serviceManagementURL;
-    private String authenticationEndpoint;
+    private String managementEndpoint;
+    private String activeDirectoryEndpoint;
     private String resourceManagerEndpoint;
     private String graphEndpoint;
     private String subscriptionId;
@@ -30,20 +30,20 @@ public class TokenCredentialData implements Serializable {
         this.azureEnvironmentName = azureEnvironmentName;
     }
 
-    public String getServiceManagementURL() {
-        return serviceManagementURL;
+    public String getManagementEndpoint() {
+        return managementEndpoint;
     }
 
-    public void setServiceManagementURL(String serviceManagementURL) {
-        this.serviceManagementURL = serviceManagementURL;
+    public void setManagementEndpoint(String managementEndpoint) {
+        this.managementEndpoint = managementEndpoint;
     }
 
-    public String getAuthenticationEndpoint() {
-        return authenticationEndpoint;
+    public String getActiveDirectoryEndpoint() {
+        return activeDirectoryEndpoint;
     }
 
-    public void setAuthenticationEndpoint(String authenticationEndpoint) {
-        this.authenticationEndpoint = authenticationEndpoint;
+    public void setActiveDirectoryEndpoint(String activeDirectoryEndpoint) {
+        this.activeDirectoryEndpoint = activeDirectoryEndpoint;
     }
 
     public String getResourceManagerEndpoint() {
