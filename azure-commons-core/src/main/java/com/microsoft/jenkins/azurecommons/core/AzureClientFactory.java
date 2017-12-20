@@ -65,7 +65,7 @@ public final class AzureClientFactory {
     }
 
     @Nonnull
-    public static Azure getClient(TokenCredentialData data) throws IOException {
+    public static Azure getClient(TokenCredentialData data) {
         AzureEnvironment env = createAzureEnvironment(data);
         if (data.getType() == TokenCredentialData.TYPE_SP) {
             return getClient(data.getClientId(),
@@ -99,11 +99,15 @@ public final class AzureClientFactory {
     }
 
     @Nonnull
-    public static Azure getClient(final int msiPort, final AzureEnvironment env) throws IOException {
+    public static Azure getClient(final int msiPort, final AzureEnvironment env) {
         MsiTokenCredentials msiToken = new MsiTokenCredentials(msiPort, env);
-        return configure(Azure.configure())
-                .authenticate(msiToken)
-                .withDefaultSubscription();
+        try {
+            return configure(Azure.configure())
+                    .authenticate(msiToken)
+                    .withDefaultSubscription();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     protected static Azure.Configurable configure(Azure.Configurable azure) {
