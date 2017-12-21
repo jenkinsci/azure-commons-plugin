@@ -30,11 +30,9 @@ public final class AzureClientFactory {
 
     private static final Logger LOGGER = Logger.getLogger(AzureClientFactory.class.getName());
 
-    public static String getUserAgent(String pluginName) {
-        String version = null;
+    public static String getUserAgent(String pluginName, String version) {
         String instanceId = null;
         try {
-            version = AzureClientFactory.class.getPackage().getImplementationVersion();
             instanceId = Jenkins.getActiveInstance().getLegacyInstanceId();
         } catch (Exception e) {
         }
@@ -66,6 +64,12 @@ public final class AzureClientFactory {
 
     @Nonnull
     public static Azure getClient(TokenCredentialData data) {
+        return getClient(data, null);
+    }
+
+
+    @Nonnull
+    public static Azure getClient(TokenCredentialData data, Configurer configurer) {
         AzureEnvironment env = createAzureEnvironment(data);
         if (data.getType() == TokenCredentialData.TYPE_SP) {
             return getClient(data.getClientId(),
@@ -86,13 +90,23 @@ public final class AzureClientFactory {
                                   final String tenantId,
                                   final String subId,
                                   final AzureEnvironment env) {
+        return getClient(clientId, secret, tenantId, subId, env, null);
+    }
+
+    @Nonnull
+    public static Azure getClient(final String clientId,
+                                  final String secret,
+                                  final String tenantId,
+                                  final String subId,
+                                  final AzureEnvironment env,
+                                  final Configurer configurer) {
 
         ApplicationTokenCredentials token = new ApplicationTokenCredentials(
                 clientId,
                 tenantId,
                 secret,
                 env);
-        return configure(Azure.configure())
+        return azure(configurer)
                 .authenticate(token)
                 .withSubscription(subId);
 
@@ -100,9 +114,14 @@ public final class AzureClientFactory {
 
     @Nonnull
     public static Azure getClient(final int msiPort, final AzureEnvironment env) {
+        return getClient(msiPort, env, null);
+    }
+
+    @Nonnull
+    public static Azure getClient(final int msiPort, final AzureEnvironment env, final Configurer configurer) {
         MsiTokenCredentials msiToken = new MsiTokenCredentials(msiPort, env);
         try {
-            return configure(Azure.configure())
+            return azure(configurer)
                     .authenticate(msiToken)
                     .withDefaultSubscription();
         } catch (IOException e) {
@@ -110,10 +129,15 @@ public final class AzureClientFactory {
         }
     }
 
-    protected static Azure.Configurable configure(Azure.Configurable azure) {
-        return azure;
+    private static Azure.Configurable azure(Configurer configurer) {
+        Azure.Configurable azure = Azure.configure();
+        return configurer == null ? azure : configurer.configure(azure);
     }
 
     private AzureClientFactory() {
+    }
+
+    public interface Configurer {
+        Azure.Configurable configure(Azure.Configurable configurable);
     }
 }
