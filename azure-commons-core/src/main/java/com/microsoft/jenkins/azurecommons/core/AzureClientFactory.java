@@ -76,9 +76,10 @@ public final class AzureClientFactory {
                     data.getClientSecret(),
                     data.getTenant(),
                     data.getSubscriptionId(),
-                    env);
+                    env,
+                    configurer);
         } else if (data.getType() == TokenCredentialData.TYPE_MSI) {
-            return getClient(data.getMsiPort(), env);
+            return getClient(data.getMsiPort(), env, configurer);
         } else {
             throw new UnsupportedOperationException("Unknown data type: " + data.getType());
         }
