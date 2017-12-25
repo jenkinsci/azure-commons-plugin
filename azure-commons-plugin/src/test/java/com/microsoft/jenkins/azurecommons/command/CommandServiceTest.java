@@ -3,11 +3,11 @@
  * Licensed under the MIT License. See LICENSE in the project root for license information.
  */
 
-package com.microsoft.jenkins.azurecommons.core.command;
+package com.microsoft.jenkins.azurecommons.command;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
-import com.microsoft.jenkins.azurecommons.core.JobContext;
+import com.microsoft.jenkins.azurecommons.JobContext;
 import hudson.EnvVars;
 import org.junit.Before;
 import org.junit.Test;

@@ -21,7 +21,6 @@ import java.io.PrintStream;
 /**
  * Encapsulates the context for a Jenkins build job.
  */
-@Deprecated
 public class JobContext {
     private final Run<?, ?> run;
     private final FilePath workspace;

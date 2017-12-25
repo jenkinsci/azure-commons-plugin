@@ -28,7 +28,6 @@ import java.util.Properties;
 /**
  * An SSH client used to interact with a remote SSH server.
  */
-@Deprecated
 public class SSHClient implements AutoCloseable {
     private final String host;
     private final int port;

@@ -13,7 +13,6 @@ import java.util.Arrays;
 /**
  * SSH authentication credentials with username and private keys.
  */
-@Deprecated
 class UsernamePrivateKeyAuth extends UsernameAuth {
     private final String passPhrase;
     private final ImmutableList<String> privateKeys;

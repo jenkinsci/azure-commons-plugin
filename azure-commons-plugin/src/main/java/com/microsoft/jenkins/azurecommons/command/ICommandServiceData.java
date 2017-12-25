@@ -5,7 +5,6 @@
 
 package com.microsoft.jenkins.azurecommons.command;
 
-@Deprecated
 public interface ICommandServiceData {
     CommandService getCommandService();
 

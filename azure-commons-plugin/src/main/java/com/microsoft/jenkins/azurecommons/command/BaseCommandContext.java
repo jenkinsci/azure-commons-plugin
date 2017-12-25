@@ -20,7 +20,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * A mixed abstract base class with both command data and command service data.
  */
-@Deprecated
 public abstract class BaseCommandContext extends Step implements ICommandServiceData, IBaseCommandData {
     private transient JobContext jobContext;
     private transient CommandState commandState = CommandState.Unknown;
