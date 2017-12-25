@@ -8,7 +8,6 @@ package com.microsoft.jenkins.azurecommons.command;
 import com.microsoft.jenkins.azurecommons.JobContext;
 import hudson.EnvVars;
 
-@Deprecated
 public interface IBaseCommandData {
     void logError(String message);
 

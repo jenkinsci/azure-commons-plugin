@@ -5,7 +5,6 @@
 
 package com.microsoft.jenkins.azurecommons.command;
 
-@Deprecated
 public enum CommandState {
     Unknown,
     Done,

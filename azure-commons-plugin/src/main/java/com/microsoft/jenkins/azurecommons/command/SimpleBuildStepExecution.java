@@ -32,7 +32,6 @@ import org.jenkinsci.plugins.workflow.steps.SynchronousNonBlockingStepExecution;
  * {@link org.jenkinsci.plugins.workflow.steps.StepDescriptor} and its {@code getRequiredContext()} should return
  * at least {@link SimpleBuildStepExecution#REQUIRED_CONTEXT}.
  */
-@Deprecated
 public class SimpleBuildStepExecution extends SynchronousNonBlockingStepExecution<Void> {
     public static final ImmutableSet<? extends Class<?>> REQUIRED_CONTEXT =
             ImmutableSet.of(Run.class, FilePath.class, Launcher.class, TaskListener.class, EnvVars.class);

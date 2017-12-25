@@ -5,7 +5,6 @@
 
 package com.microsoft.jenkins.azurecommons.command;
 
-@Deprecated
 public interface ICommand<T extends IBaseCommandData> {
     void execute(T context);
 }

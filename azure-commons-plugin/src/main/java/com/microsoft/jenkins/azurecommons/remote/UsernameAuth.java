@@ -13,7 +13,6 @@ import hudson.util.Secret;
 /**
  * Abstract SSH authentication credentials with username.
  */
-@Deprecated
 abstract class UsernameAuth {
     private final String username;
 

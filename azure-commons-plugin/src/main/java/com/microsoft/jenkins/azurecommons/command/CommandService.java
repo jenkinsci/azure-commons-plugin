@@ -19,7 +19,6 @@ import static com.google.common.base.Preconditions.checkState;
  * <p>
  * NB. Not fully type safe on generic types.
  */
-@Deprecated
 @SuppressWarnings("unchecked")
 public final class CommandService {
     private final Map<Class<? extends ICommand>, Class<? extends ICommand>> transitionMap;

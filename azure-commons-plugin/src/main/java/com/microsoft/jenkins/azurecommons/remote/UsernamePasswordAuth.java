@@ -8,7 +8,6 @@ package com.microsoft.jenkins.azurecommons.remote;
 /**
  * SSH authentication credentials with username and password.
  */
-@Deprecated
 class UsernamePasswordAuth extends UsernameAuth {
     private final String password;
 

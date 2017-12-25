@@ -8,7 +8,6 @@ package com.microsoft.jenkins.azurecommons.command;
 /**
  * Indicates that a command is aware of its next command to be executed based on its execution status.
  */
-@Deprecated
 public interface INextCommandAware {
     Class nextCommand();
 }
