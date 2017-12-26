@@ -1,5 +1,8 @@
 # Azure Commons Plugin Changelog
 
+## Version 0.2.2.1, 2017-12-26
+* Fix AI
+
 ## Version 0.2.0, 2017-12-18
 * Split the core library package
 
