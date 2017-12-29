@@ -1,7 +1,11 @@
 package com.microsoft.jenkins.azurecommons.core.credentials;
 
-import org.apache.commons.lang3.SerializationUtils;
-
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
 
 public class TokenCredentialData implements Serializable {
@@ -110,11 +114,54 @@ public class TokenCredentialData implements Serializable {
         this.type = type;
     }
 
+    //
+    // copy from 'org.apache.commons.lang3.SerializationUtils' to avoid the trans-classloader issue
+    //
     public static byte[] serialize(TokenCredentialData obj) {
-        return SerializationUtils.serialize(obj);
+        final ByteArrayOutputStream baos = new ByteArrayOutputStream(512);
+        ObjectOutputStream out = null;
+        try {
+            // stream closed in the finally
+            out = new ObjectOutputStream(baos);
+            out.writeObject(obj);
+
+        } catch (final IOException ex) {
+            throw new RuntimeException(ex);
+        } finally {
+            try {
+                if (out != null) {
+                    out.close();
+                }
+            } catch (final IOException ex) { // NOPMD
+                // ignore close exception
+            }
+        }
+        return baos.toByteArray();
     }
 
     public static TokenCredentialData deserialize(byte[] data) {
-        return SerializationUtils.deserialize(data);
+        if (data == null) {
+            throw new IllegalArgumentException("The byte[] must not be null");
+        }
+        final InputStream inputStream = new ByteArrayInputStream(data);
+        ObjectInputStream in = null;
+        try {
+            // stream closed in the finally
+            in = new ObjectInputStream(inputStream);
+            @SuppressWarnings("unchecked")
+            final TokenCredentialData obj = (TokenCredentialData) in.readObject();
+            return obj;
+
+        } catch (final ClassNotFoundException | IOException ex) {
+            throw new RuntimeException(ex);
+        } finally {
+            try {
+                if (in != null) {
+                    in.close();
+                }
+            } catch (final IOException ex) { // NOPMD
+                // ignore close exception
+            }
+        }
     }
 }

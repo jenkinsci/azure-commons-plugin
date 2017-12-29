@@ -19,6 +19,7 @@ import com.microsoft.azure.AzureEnvironment;
 import com.microsoft.azure.credentials.ApplicationTokenCredentials;
 import com.microsoft.azure.management.Azure;
 import com.microsoft.jenkins.azurecommons.core.credentials.MsiTokenCredentials;
+import com.microsoft.jenkins.azurecommons.core.credentials.RemoteMsiTokenCredentials;
 import com.microsoft.jenkins.azurecommons.core.credentials.TokenCredentialData;
 import jenkins.model.Jenkins;
 
@@ -120,7 +121,7 @@ public final class AzureClientFactory {
 
     @Nonnull
     public static Azure getClient(final int msiPort, final AzureEnvironment env, final Configurer configurer) {
-        MsiTokenCredentials msiToken = new MsiTokenCredentials(msiPort, env);
+        MsiTokenCredentials msiToken = new RemoteMsiTokenCredentials(msiPort, env);
         try {
             return azure(configurer)
                     .authenticate(msiToken)

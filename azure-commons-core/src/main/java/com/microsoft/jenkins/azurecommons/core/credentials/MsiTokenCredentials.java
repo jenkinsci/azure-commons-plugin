@@ -42,14 +42,18 @@ public class MsiTokenCredentials extends AzureTokenCredentials {
      *
      * @param environment the Azure environment to use
      */
-    public MsiTokenCredentials(int msiPort, AzureEnvironment environment) {
+    public MsiTokenCredentials(final int msiPort, AzureEnvironment environment) {
         super(environment, null);
         tokens = new HashMap<>();
         this.msiPort = msiPort;
     }
 
+    int getMsiPort() {
+        return msiPort;
+    }
+
     @Override
-    public synchronized String getToken(String resource) throws IOException {
+    public synchronized String getToken(final String resource) throws IOException {
         Token authenticationResult = tokens.get(resource);
         if (authenticationResult == null || authenticationResult.isExpired()) {
             authenticationResult = acquireAccessToken(resource);
@@ -58,7 +62,11 @@ public class MsiTokenCredentials extends AzureTokenCredentials {
         return authenticationResult.getAccessToken();
     }
 
-    private Token acquireAccessToken(String resource) throws IOException {
+    protected Token acquireAccessToken(final String resource) throws IOException {
+        return parseToken(requestLocalMsiEndpoint(resource, msiPort));
+    }
+
+    protected static String requestLocalMsiEndpoint(final String resource, final int msiPort) throws IOException {
         HttpLoggingInterceptor loggingInterceptor = new HttpLoggingInterceptor();
         loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
 
@@ -79,12 +87,11 @@ public class MsiTokenCredentials extends AzureTokenCredentials {
         if (!response.isSuccessful()) {
             throw new RuntimeException("http response: " + response.code() + " " + response.message());
         } else {
-            String responseBody = response.body().string();
-            return parseToken(responseBody);
+            return response.body().string();
         }
     }
 
-    private Token parseToken(String responseBody) throws IOException {
+    protected Token parseToken(final String responseBody) throws IOException {
         Token token = mapper.readValue(responseBody, Token.class);
         if (token == null) {
             throw new RuntimeException("Failed to parse the response.");
@@ -127,7 +134,7 @@ public class MsiTokenCredentials extends AzureTokenCredentials {
         }
 
         public Token(String resource, long expiresIn, long expiresOn,
-                      String accessToken, String refreshToken, String tokenType) {
+                     String accessToken, String refreshToken, String tokenType) {
             this.resource = resource;
             this.expiresIn = expiresIn;
             this.expiresOn = expiresOn;
