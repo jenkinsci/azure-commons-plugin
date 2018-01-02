@@ -1,5 +1,7 @@
 package com.microsoft.jenkins.azurecommons.core.credentials;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -117,6 +119,7 @@ public class TokenCredentialData implements Serializable {
     //
     // copy from 'org.apache.commons.lang3.SerializationUtils' to avoid the trans-classloader issue
     //
+    @SuppressFBWarnings
     public static byte[] serialize(TokenCredentialData obj) {
         final ByteArrayOutputStream baos = new ByteArrayOutputStream(512);
         ObjectOutputStream out = null;
@@ -139,6 +142,7 @@ public class TokenCredentialData implements Serializable {
         return baos.toByteArray();
     }
 
+    @SuppressFBWarnings
     public static TokenCredentialData deserialize(byte[] data) {
         if (data == null) {
             throw new IllegalArgumentException("The byte[] must not be null");
