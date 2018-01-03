@@ -19,7 +19,6 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 import okhttp3.logging.HttpLoggingInterceptor;
-import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -95,10 +94,10 @@ public class MsiTokenCredentials extends AzureTokenCredentials {
         Token token = mapper.readValue(responseBody, Token.class);
         if (token == null) {
             throw new RuntimeException("Failed to parse the response.");
-        } else if (StringUtils.isEmpty(token.getAccessToken())) {
+        } else if (token.getAccessToken() == null || token.getAccessToken().equals("")) {
             throw new RuntimeException("The access token isn't included in the response.");
         } else {
-            if (StringUtils.isEmpty(tenantId)) {
+            if (tenantId == null || tenantId.equals("")) {
                 String rawJwt = token.getAccessToken();
                 DecodedJWT jwt = JWT.decode(rawJwt);
                 this.tenantId = jwt.getClaim("tid").asString();

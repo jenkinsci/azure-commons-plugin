@@ -29,7 +29,7 @@ public class RemoteMsiTokenCredentials extends MsiTokenCredentials {
     protected Token acquireAccessToken(final String resource) throws IOException {
         VirtualChannel channel = SlaveComputer.getChannelToMaster();
         if (channel == null) {
-            throw new RuntimeException("Failed to get the channel to master. Check if the running environment.");
+            throw new RuntimeException("Failed to get the channel to master. Please check the running environment.");
         }
         String responseBody;
         try {
