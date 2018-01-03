@@ -1,5 +1,8 @@
 # Azure Commons Plugin Changelog
 
+## Version 0.2.3, 2018-01-03
+* Enable remote MSI requests on Jenkins agents
+
 ## Version 0.2.2.1, 2017-12-26
 * Fix AI
 
