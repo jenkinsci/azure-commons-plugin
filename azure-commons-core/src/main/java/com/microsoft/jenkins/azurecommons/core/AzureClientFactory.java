@@ -73,12 +73,24 @@ public final class AzureClientFactory {
     public static Azure getClient(TokenCredentialData data, Configurer configurer) {
         AzureEnvironment env = createAzureEnvironment(data);
         if (data.getType() == TokenCredentialData.TYPE_SP) {
-            return getClient(data.getClientId(),
-                    data.getClientSecret(),
-                    data.getTenant(),
-                    data.getSubscriptionId(),
-                    env,
-                    configurer);
+            byte[] certificateBytes = data.getCertificateBytes();
+            if (certificateBytes == null || certificateBytes.length == 0) {
+                return getClient(data.getClientId(),
+                        data.getClientSecret(),
+                        data.getTenant(),
+                        data.getSubscriptionId(),
+                        env,
+                        configurer);
+            } else {
+                return getClient(
+                        data.getClientId(),
+                        certificateBytes,
+                        data.getCertificatePassword(),
+                        data.getTenant(),
+                        data.getSubscriptionId(),
+                        env,
+                        configurer);
+            }
         } else if (data.getType() == TokenCredentialData.TYPE_MSI) {
             return getClient(data.getMsiPort(), env, configurer);
         } else {
@@ -93,6 +105,25 @@ public final class AzureClientFactory {
                                   final String subId,
                                   final AzureEnvironment env) {
         return getClient(clientId, secret, tenantId, subId, env, null);
+    }
+
+    @Nonnull
+    public static Azure getClient(final String clientId,
+                                  final byte[] certificateBytes,
+                                  final String cerficiatePassword,
+                                  final String tenantId,
+                                  final String subscriptionId,
+                                  final AzureEnvironment env,
+                                  final Configurer configurer) {
+        ApplicationTokenCredentials token = new ApplicationTokenCredentials(
+                clientId,
+                tenantId,
+                certificateBytes,
+                cerficiatePassword,
+                env);
+        return azure(configurer)
+                .authenticate(token)
+                .withSubscription(subscriptionId);
     }
 
     @Nonnull
