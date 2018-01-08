@@ -9,6 +9,7 @@ import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.util.Arrays;
 
 public class TokenCredentialData implements Serializable {
     private static final long serialVersionUID = 1L;
@@ -25,6 +26,8 @@ public class TokenCredentialData implements Serializable {
     private String subscriptionId;
     private String clientId;
     private String clientSecret;
+    private byte[] certificateBytes;
+    private String certificatePassword;
     private String tenant;
     private int msiPort;
 
@@ -82,6 +85,29 @@ public class TokenCredentialData implements Serializable {
 
     public void setClientId(String clientId) {
         this.clientId = clientId;
+    }
+
+    public byte[] getCertificateBytes() {
+        if (certificateBytes == null) {
+            return null;
+        }
+        return Arrays.copyOf(certificateBytes, certificateBytes.length);
+    }
+
+    public void setCertificateBytes(byte[] certificateBytes) {
+        if (certificateBytes == null) {
+            this.certificateBytes = null;
+        } else {
+            this.certificateBytes = Arrays.copyOf(certificateBytes, certificateBytes.length);
+        }
+    }
+
+    public String getCertificatePassword() {
+        return certificatePassword;
+    }
+
+    public void setCertificatePassword(String certificatePassword) {
+        this.certificatePassword = certificatePassword;
     }
 
     public String getClientSecret() {
