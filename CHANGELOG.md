@@ -1,5 +1,8 @@
 # Azure Commons Plugin Changelog
 
+## Version 0.2.4, 2018-01-09
+* Enable certificate based service principal authentication for Azure client
+
 ## Version 0.2.3, 2018-01-03
 * Enable remote MSI requests on Jenkins agents
 
