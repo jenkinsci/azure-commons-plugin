@@ -8,6 +8,7 @@ package com.microsoft.jenkins.azurecommons.telemetry;
 
 
 import com.microsoft.applicationinsights.TelemetryClient;
+import hudson.Main;
 import hudson.Plugin;
 import hudson.model.Computer;
 import hudson.node_monitors.ArchitectureMonitor;
@@ -36,6 +37,26 @@ public class AppInsightsClient {
 
     public AppInsightsClient(Plugin plugin) {
         this.plugin = plugin;
+
+        // If in development mode, use the test AI instrumentation key.
+        //
+        // This works when we develop other plugins that depend on azure-commons. In that case azure-commons is
+        // fetched as a dependency from jenkins-ci with the production instrumentation key, so if without this
+        // injection the telemetry data generated in development mode will go to the production sink.
+        //
+        // http://jenkins-ci.361315.n4.nabble.com/How-to-check-if-plugin-is-running-in-development-mode-td4739906.html
+        if (Main.isDevelopmentMode || Boolean.getBoolean("hudson.hpi.run")) {
+            // Ensure that the instrumentation key is not overwritten explicitly.
+            //
+            // https://docs.microsoft.com/en-us/azure/application-insights/app-insights-java-get-started
+            // #alternative-ways-to-set-the-instrumentation-key
+            if (System.getProperty("APPLICATION_INSIGHTS_IKEY") == null
+                    && System.getenv("APPLICATION_INSIGHTS_IKEY") == null) {
+                // Inject the test AI instrumentation key.
+                this.instrumentationKey = "712adcab-2593-48c6-8367-8a940f483bc1";
+                LOGGER.info("Use test AI instrumentation key for " + plugin.getClass().getName());
+            }
+        }
     }
 
     public void sendEvent(String item, String action, Map<String, String> properties, boolean force) {
