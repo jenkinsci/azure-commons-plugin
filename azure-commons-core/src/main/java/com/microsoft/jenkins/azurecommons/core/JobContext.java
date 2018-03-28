@@ -9,6 +9,7 @@ import hudson.EnvVars;
 import hudson.FilePath;
 import hudson.Launcher;
 import hudson.Util;
+import hudson.model.Item;
 import hudson.model.Run;
 import hudson.model.TaskListener;
 import org.apache.commons.io.IOUtils;
@@ -51,6 +52,17 @@ public class JobContext {
 
     public TaskListener getTaskListener() {
         return taskListener;
+    }
+
+    /**
+     * The owner project of this run.
+     */
+    public Item getOwner() {
+        Run<?, ?> currentRun = getRun();
+        if (currentRun != null) {
+            return currentRun.getParent();
+        }
+        return null;
     }
 
     public EnvVars envVars() {
