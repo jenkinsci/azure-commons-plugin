@@ -1,5 +1,9 @@
 # Azure Commons Plugin Changelog
 
+## Version 0.2.5, 2018-03-29
+* Fix AI for development environment
+* Add helper methods for scoped credentials look up
+
 ## Version 0.2.4, 2018-01-09
 * Enable certificate based service principal authentication for Azure client
 
