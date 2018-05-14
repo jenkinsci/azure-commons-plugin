@@ -36,4 +36,25 @@
             <version>4.12</version>
         </dependency>
     </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <configuration>
+                    <archive>
+                        <!-- JENKINS-51147 -->
+                        <!-- com.microsoft.jenkins.azurecommons.core.EnvironmentInjector$EnvironmentInjectionAction -->
+                        <!-- See: https://github.com/jenkinsci/jep/tree/master/jep/200#extensibility -->
+                        <manifestEntries>
+                            <Short-Name>${project.artifactId}</Short-Name>
+                            <Plugin-Version>${project.version}</Plugin-Version>
+                            <Jenkins-ClassFilter-Whitelisted>true</Jenkins-ClassFilter-Whitelisted>
+                        </manifestEntries>
+                    </archive>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 </project>
