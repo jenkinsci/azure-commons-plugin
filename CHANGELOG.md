@@ -1,5 +1,8 @@
 # Azure Commons Plugin Changelog
 
+## Version 0.2.6, 2018-05-17
+* Whitelist classes for JEP-200 XStream serialization (JENKINS-51147)
+
 ## Version 0.2.5, 2018-03-29
 * Fix AI for development environment
 * Add helper methods for scoped credentials look up
