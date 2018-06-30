@@ -21,10 +21,18 @@ import com.microsoft.azure.management.Azure;
 import com.microsoft.jenkins.azurecommons.core.credentials.MsiTokenCredentials;
 import com.microsoft.jenkins.azurecommons.core.credentials.RemoteMsiTokenCredentials;
 import com.microsoft.jenkins.azurecommons.core.credentials.TokenCredentialData;
+import hudson.ProxyConfiguration;
 import jenkins.model.Jenkins;
+import okhttp3.Authenticator;
+import okhttp3.Credentials;
+import okhttp3.Request;
+import okhttp3.Response;
+import okhttp3.Route;
+import org.apache.commons.lang.StringUtils;
 
 import javax.annotation.Nonnull;
 import java.io.IOException;
+import java.net.Proxy;
 import java.util.logging.Logger;
 
 public final class AzureClientFactory {
@@ -164,7 +172,38 @@ public final class AzureClientFactory {
 
     private static Azure.Configurable azure(Configurer configurer) {
         Azure.Configurable azure = Azure.configure();
-        return configurer == null ? azure : configurer.configure(azure);
+
+        Jenkins jenkins = Jenkins.getInstance();
+        if (jenkins != null) {
+            ProxyConfiguration proxyConfig = jenkins.proxy;
+            if (proxyConfig != null) {
+                Proxy proxy = proxyConfig.createProxy();
+                azure = azure.withProxy(proxy);
+
+                // TODO: Proxy auth
+                // Unfortunately the auth doesn't actually work due to a bug in Azure SDK:
+                // https://github.com/Azure/azure-sdk-for-java/issues/2030
+                // Let's keep an eye on their state.
+                final String userName = proxyConfig.getUserName();
+                final String password = proxyConfig.getPassword();
+                if (StringUtils.isNotEmpty(userName) && StringUtils.isNotEmpty(password)) {
+                    azure = azure.withProxyAuthenticator(new Authenticator() {
+                        @Override
+                        public Request authenticate(Route route, Response response) throws IOException {
+                            String credential = Credentials.basic(userName, password);
+                            return response.request().newBuilder().header("Proxy-Authorization", credential)
+                                    .build();
+                        }
+                    });
+                }
+            }
+        }
+
+        if (configurer != null) {
+            azure = configurer.configure(azure);
+        }
+
+        return azure;
     }
 
     private AzureClientFactory() {
