@@ -9,6 +9,6 @@ This repo contains two modules:
 We use [Jenkins JIRA](https://issues.jenkins-ci.org/) to record all bugs and feature requests. Please follow beblow steps to create your own issues.
 
 1. Search in Jira to see if the issue was existed already.
-2. Create a new issue with the component `azure-credentials-plugin` .
+2. Create a new issue with the component `azure-commons-plugin` .
 
 You can refer to [Jira doc](https://confluence.atlassian.com/jiracoreserver/creating-issues-and-sub-tasks-939937904.html#Creatingissuesandsub-tasks-Creatinganissue) for detailed instructions about creating an issue.
