@@ -1,5 +1,8 @@
 # Azure Commons Plugin Changelog
 
+## Version 0.2.7, 2018-09-18
+* Upgrade Azure sdk to version 1.15.1
+
 ## Version 0.2.6, 2018-05-17
 * Whitelist classes for JEP-200 XStream serialization (JENKINS-51147)
 
