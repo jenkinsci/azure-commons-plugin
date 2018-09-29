@@ -1,5 +1,8 @@
 # Azure Commons Plugin Changelog
 
+## Version 0.2.8, 2018-09-29
+* Downgrade Azure sdk to version 1.3.0
+
 ## Version 0.2.7, 2018-09-18
 * Upgrade Azure sdk to version 1.15.1
 
