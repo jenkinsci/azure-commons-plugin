@@ -110,7 +110,7 @@ public final class AzureClientFactory {
     @Nonnull
     public static Azure getClient(final String clientId,
                                   final byte[] certificateBytes,
-                                  final String cerficiatePassword,
+                                  final String certificatePassword,
                                   final String tenantId,
                                   final String subscriptionId,
                                   final AzureEnvironment env,
@@ -119,7 +119,7 @@ public final class AzureClientFactory {
                 clientId,
                 tenantId,
                 certificateBytes,
-                cerficiatePassword,
+                certificatePassword,
                 env);
         return azure(configurer)
                 .authenticate(token)
