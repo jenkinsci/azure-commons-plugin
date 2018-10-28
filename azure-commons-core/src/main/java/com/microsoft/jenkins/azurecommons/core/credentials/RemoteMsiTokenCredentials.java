@@ -18,7 +18,7 @@ public class RemoteMsiTokenCredentials extends MsiTokenCredentials {
     /**
      * Initializes a new instance of the AzureTokenCredentials.
      *
-     * @param msiPort
+     * @param msiPort the MSI port to use
      * @param environment the Azure environment to use
      */
     public RemoteMsiTokenCredentials(int msiPort, AzureEnvironment environment) {
