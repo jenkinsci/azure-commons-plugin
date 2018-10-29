@@ -12,7 +12,7 @@ public final class AppInsightsConstants {
     public static final String EVENT_NAME_SEPARATOR = ".";
 
     // common properties for AI events
-    public static final String PROP_JENKINS_INSTAMCE_ID = "JenkinsInstanceId";
+    public static final String PROP_JENKINS_INSTANCE_ID = "JenkinsInstanceId";
     public static final String PROP_JENKINS_VERSION = "JenkinsVersion";
     public static final String PROP_PLUGIN_NAME = "PluginName";
     public static final String PROP_PLUGIN_VERSION = "PluginVersion";

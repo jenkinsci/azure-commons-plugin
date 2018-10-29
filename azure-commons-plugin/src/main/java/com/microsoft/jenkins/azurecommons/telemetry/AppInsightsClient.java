@@ -144,12 +144,12 @@ public class AppInsightsClient {
     private void putJenkinsInfo(final Map<String, String> properties) {
         final Jenkins j = Jenkins.getInstance();
         if (j == null) {
-            properties.put(AppInsightsConstants.PROP_JENKINS_INSTAMCE_ID, "local");
+            properties.put(AppInsightsConstants.PROP_JENKINS_INSTANCE_ID, "local");
             properties.put(AppInsightsConstants.PROP_JENKINS_VERSION, "local");
             return;
         }
 
-        properties.put(AppInsightsConstants.PROP_JENKINS_INSTAMCE_ID, j.getLegacyInstanceId());
+        properties.put(AppInsightsConstants.PROP_JENKINS_INSTANCE_ID, j.getLegacyInstanceId());
         properties.put(AppInsightsConstants.PROP_JENKINS_VERSION, j.VERSION);
         for (Computer c : j.getComputers()) {
             if (c.getNode() == j) {
