@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (c) Microsoft Corporation. All rights reserved.
  * Licensed under the MIT License. See License.txt in the project root for
  * license information.
@@ -10,7 +10,7 @@ import hudson.Extension;
 import hudson.model.PageDecorator;
 import jenkins.model.Jenkins;
 
-import static hudson.util.TimeUnit2.DAYS;
+import static java.util.concurrent.TimeUnit.DAYS;
 
 @Extension
 public class AppInsightsPageDecorator extends PageDecorator {

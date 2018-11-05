@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (c) Microsoft Corporation. All rights reserved.
  * Licensed under the MIT License. See License.txt in the project root for
  * license information.
@@ -34,8 +34,8 @@ public final class AppInsightsUtils {
             digest.update(bytes);
             byte[] bytesAfterDigest = digest.digest();
             final StringBuilder buffer = new StringBuilder();
-            for (int i = 0; i < bytesAfterDigest.length; i++) {
-                buffer.append(Integer.toString((bytesAfterDigest[i] & byteMask) + bytePadding, radix).substring(1));
+            for (byte aBytesAfterDigest : bytesAfterDigest) {
+                buffer.append(Integer.toString((aBytesAfterDigest & byteMask) + bytePadding, radix).substring(1));
             }
             ret = buffer.toString();
         } catch (NoSuchAlgorithmException | UnsupportedEncodingException ex) {

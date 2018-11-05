@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (c) Microsoft Corporation. All rights reserved.
  * Licensed under the MIT License. See License.txt in the project root for
  * license information.
@@ -39,6 +39,7 @@ public class MsiTokenCredentials extends AzureTokenCredentials {
     /**
      * Initializes a new instance of the AzureTokenCredentials.
      *
+     * @param msiPort the MSI port to use
      * @param environment the Azure environment to use
      */
     public MsiTokenCredentials(final int msiPort, AzureEnvironment environment) {

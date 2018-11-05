@@ -58,7 +58,9 @@ public class JobContext {
     }
 
     /**
-     * The owner project of this run.
+     * Gets the owner project of this run.
+     *
+     * @return the owner project
      */
     public Item getOwner() {
         Run<?, ?> currentRun = getRun();
