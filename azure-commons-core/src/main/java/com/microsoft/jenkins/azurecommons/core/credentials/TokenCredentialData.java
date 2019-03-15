@@ -16,6 +16,7 @@ public class TokenCredentialData implements Serializable {
 
     public static final int TYPE_SP = 0;
     public static final int TYPE_MSI = 1;
+    public static final int TYPE_IMDS = 2;
 
     private int type;
     private String azureEnvironmentName;

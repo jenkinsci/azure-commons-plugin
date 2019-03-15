@@ -18,7 +18,9 @@ package com.microsoft.jenkins.azurecommons.core;
 import com.microsoft.azure.AzureEnvironment;
 import com.microsoft.azure.credentials.ApplicationTokenCredentials;
 import com.microsoft.azure.management.Azure;
+import com.microsoft.jenkins.azurecommons.core.credentials.ImdsTokenCredentials;
 import com.microsoft.jenkins.azurecommons.core.credentials.MsiTokenCredentials;
+import com.microsoft.jenkins.azurecommons.core.credentials.RemoteImdsTokenCredentials;
 import com.microsoft.jenkins.azurecommons.core.credentials.RemoteMsiTokenCredentials;
 import com.microsoft.jenkins.azurecommons.core.credentials.TokenCredentialData;
 import jenkins.model.Jenkins;
@@ -93,6 +95,8 @@ public final class AzureClientFactory {
             }
         } else if (data.getType() == TokenCredentialData.TYPE_MSI) {
             return getClient(data.getMsiPort(), env, configurer);
+        } else if (data.getType() == TokenCredentialData.TYPE_IMDS) {
+            return getClient(env, configurer);
         } else {
             throw new UnsupportedOperationException("Unknown data type: " + data.getType());
         }
@@ -146,16 +150,35 @@ public final class AzureClientFactory {
     }
 
     @Nonnull
+    @Deprecated
     public static Azure getClient(final int msiPort, final AzureEnvironment env) {
         return getClient(msiPort, env, null);
     }
 
     @Nonnull
+    @Deprecated
     public static Azure getClient(final int msiPort, final AzureEnvironment env, final Configurer configurer) {
         MsiTokenCredentials msiToken = new RemoteMsiTokenCredentials(msiPort, env);
         try {
             return azure(configurer)
                     .authenticate(msiToken)
+                    .withDefaultSubscription();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Nonnull
+    public static Azure getClient(final AzureEnvironment env) {
+        return getClient(env, null);
+    }
+
+    @Nonnull
+    public static Azure getClient(final AzureEnvironment env, final Configurer configurer) {
+        ImdsTokenCredentials imdsToken = new RemoteImdsTokenCredentials(env);
+        try {
+            return azure(configurer)
+                    .authenticate(imdsToken)
                     .withDefaultSubscription();
         } catch (IOException e) {
             throw new RuntimeException(e);

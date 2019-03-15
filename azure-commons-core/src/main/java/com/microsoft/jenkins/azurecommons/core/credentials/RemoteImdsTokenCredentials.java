@@ -1,6 +1,9 @@
 /*
- * Copyright (C) 2017 Baidu, Inc. All Rights Reserved.
+ * Copyright (c) Microsoft Corporation. All rights reserved.
+ * Licensed under the MIT License. See License.txt in the project root for
+ * license information.
  */
+
 package com.microsoft.jenkins.azurecommons.core.credentials;
 
 import com.microsoft.azure.AzureEnvironment;
@@ -12,18 +15,16 @@ import org.jenkinsci.remoting.RoleChecker;
 import java.io.IOException;
 
 /**
- * Enable retrieving the msi token from Jenkins agents.
+ * Enable retrieving the IMDS token from Jenkins agents.
  */
-@Deprecated
-public class RemoteMsiTokenCredentials extends MsiTokenCredentials {
+public class RemoteImdsTokenCredentials extends ImdsTokenCredentials {
     /**
      * Initializes a new instance of the AzureTokenCredentials.
      *
-     * @param msiPort the MSI port to use
      * @param environment the Azure environment to use
      */
-    public RemoteMsiTokenCredentials(int msiPort, AzureEnvironment environment) {
-        super(msiPort, environment);
+    public RemoteImdsTokenCredentials(AzureEnvironment environment) {
+        super(environment);
     }
 
     @Override
@@ -34,25 +35,23 @@ public class RemoteMsiTokenCredentials extends MsiTokenCredentials {
         }
         String responseBody;
         try {
-            responseBody = channel.call(new RequestMsiTokenTask(resource, getMsiPort()));
+            responseBody = channel.call(new RequestImdsTokenTask(resource));
         } catch (InterruptedException e) {
             throw new RuntimeException("Execution on the master is Interrupted");
         }
         return parseToken(responseBody);
     }
 
-    public static class RequestMsiTokenTask implements Callable<String, IOException> {
+    public static class RequestImdsTokenTask implements Callable<String, IOException> {
         private final String resource;
-        private final int msiPort;
 
-        public RequestMsiTokenTask(String resource, int msiPort) {
+        public RequestImdsTokenTask(String resource) {
             this.resource = resource;
-            this.msiPort = msiPort;
         }
 
         @Override
         public String call() throws IOException {
-            return requestLocalMsiEndpoint(resource, msiPort);
+            return requestIMDSEndpoint(resource);
         }
 
         @Override
