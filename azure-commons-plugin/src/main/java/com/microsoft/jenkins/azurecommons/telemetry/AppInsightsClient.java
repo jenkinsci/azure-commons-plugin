@@ -7,7 +7,6 @@
 package com.microsoft.jenkins.azurecommons.telemetry;
 
 
-import com.microsoft.applicationinsights.TelemetryClient;
 import hudson.Main;
 import hudson.Plugin;
 import hudson.model.Computer;
@@ -15,9 +14,11 @@ import hudson.node_monitors.ArchitectureMonitor;
 import jenkins.model.Jenkins;
 import org.apache.commons.lang.StringUtils;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Properties;
 import java.util.logging.Logger;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -28,12 +29,13 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class AppInsightsClient {
     private static final Logger LOGGER = Logger.getLogger(AppInsightsClient.class.getName());
+    private static final String INSTRUMENTATION_KEY_NAME = "InstrumentationKey";
 
     private String instrumentationKey = null;
     private String eventNamePrefix = AppInsightsConstants.DEFAULT_EVENT_PREFIX;
 
     private final Plugin plugin;
-    private TelemetryClient telemetryClient;
+    private JenkinsTelemetryClient telemetryClient;
 
     public AppInsightsClient(Plugin plugin) {
         this.plugin = plugin;
@@ -56,7 +58,25 @@ public class AppInsightsClient {
                 this.instrumentationKey = "712adcab-2593-48c6-8367-8a940f483bc1";
                 LOGGER.info("Use test AI instrumentation key for " + plugin.getClass().getName());
             }
+        } else {
+            String ikey = System.getProperty("APPLICATION_INSIGHTS_IKEY");
+            if (ikey == null) {
+                ikey = System.getenv("APPLICATION_INSIGHTS_IKEY");
+            }
+            if (ikey != null) {
+                this.instrumentationKey = ikey;
+                LOGGER.info("Use AI instrumentation key from system properties or environment variables.");
+            } else {
+                Properties prop = new Properties();
+                try {
+                    prop.load(AppInsightsClient.class.getClassLoader().getResourceAsStream("ai.properties"));
+                    this.instrumentationKey = prop.getProperty(INSTRUMENTATION_KEY_NAME);
+                } catch (IOException e) {
+                    LOGGER.severe("Failed to load application insights configuration file.");
+                }
+            }
         }
+        telemetryClient = new JenkinsTelemetryClient(this.instrumentationKey);
     }
 
     public void sendEvent(String item, String action, Map<String, String> properties, boolean force) {
@@ -65,9 +85,8 @@ public class AppInsightsClient {
                 final String eventName = buildEventName(item, action);
                 final Map<String, String> formalizedProperties = formalizeProperties(properties);
 
-                final TelemetryClient client = getTelemetryClient();
-                client.trackEvent(eventName, formalizedProperties, null);
-                client.flush();
+                final JenkinsTelemetryClient client = getTelemetryClient();
+                client.send(eventName, formalizedProperties);
                 LOGGER.fine("AI: " + eventName);
             }
         } catch (Exception e) {
@@ -81,9 +100,7 @@ public class AppInsightsClient {
     public AppInsightsClient withInstrumentationKey(String key) {
         checkNotNull(key, "Parameter instrumentation key is null.");
         this.instrumentationKey = key;
-        if (telemetryClient != null) {
-            telemetryClient.getContext().setInstrumentationKey(key);
-        }
+        this.telemetryClient.setInstrumentKey(key);
         return this;
     }
 
@@ -93,14 +110,7 @@ public class AppInsightsClient {
         return this;
     }
 
-    private TelemetryClient getTelemetryClient() {
-        if (telemetryClient == null) {
-            telemetryClient = new TelemetryClient();
-            if (StringUtils.isNotBlank(instrumentationKey)) {
-                telemetryClient.getContext().setInstrumentationKey(instrumentationKey);
-            }
-        }
-
+    private JenkinsTelemetryClient getTelemetryClient() {
         return telemetryClient;
     }
 
