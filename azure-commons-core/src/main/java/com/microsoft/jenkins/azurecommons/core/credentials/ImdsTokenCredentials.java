@@ -7,10 +7,8 @@
 package com.microsoft.jenkins.azurecommons.core.credentials;
 
 import com.microsoft.azure.AzureEnvironment;
-import okhttp3.FormBody;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
-import okhttp3.RequestBody;
 import okhttp3.Response;
 import okhttp3.logging.HttpLoggingInterceptor;
 
@@ -29,7 +27,6 @@ public class ImdsTokenCredentials extends AbstractTokenCredentials {
         setTokens(new HashMap<String, Token>());
     }
 
-
     protected Token acquireAccessToken(final String resource) throws IOException {
         return parseToken(requestIMDSEndpoint(resource));
     }
@@ -42,13 +39,10 @@ public class ImdsTokenCredentials extends AbstractTokenCredentials {
                 .addInterceptor(loggingInterceptor)
                 .build();
 
-        RequestBody body = new FormBody.Builder()
-                .add("resource", resource)
-                .build();
         Request request = new Request.Builder()
                 .addHeader("Metadata", "true")
-                .url("http://169.254.169.254/metadata/identity/oauth2/token")
-                .post(body)
+                .url("http://169.254.169.254/metadata/identity/oauth2/token?api-version=2018-02-01"
+                        + "&resource=https://management.azure.com/")
                 .build();
 
         Response response = client.newCall(request).execute();
