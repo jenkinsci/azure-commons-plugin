@@ -1,5 +1,9 @@
 # Azure Commons Plugin Changelog
 
+## Version 0.2.9, 2019-03-27
+* Use https request instead of AI sdk
+* Add support Azure resources IMDS endpoint
+
 ## Version 0.2.8, 2018-09-29
 * Downgrade Azure sdk to version 1.3.0
 
