@@ -1,5 +1,8 @@
 # Azure Commons Plugin Changelog
 
+## Version 0.2.10, 2019-03-28
+* Fix URL encode issue for IMDS endpoint
+
 ## Version 0.2.9, 2019-03-27
 * Use https request instead of AI sdk
 * Add support Azure resources IMDS endpoint
