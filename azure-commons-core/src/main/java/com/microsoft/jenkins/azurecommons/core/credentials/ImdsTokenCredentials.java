@@ -41,10 +41,11 @@ public class ImdsTokenCredentials extends AbstractTokenCredentials {
                 .addInterceptor(loggingInterceptor)
                 .build();
 
-        String parameters = "api-version=2018-02-01&resource=https://management.azure.com/";
+        String parameters = "https://management.azure.com/";
         Request request = new Request.Builder()
                 .addHeader("Metadata", "true")
                 .url("http://169.254.169.254/metadata/identity/oauth2/token?"
+                        + "api-version=2018-02-01&resource="
                         + URLEncoder.encode(parameters, StandardCharsets.UTF_8.toString()))
                 .build();
 
