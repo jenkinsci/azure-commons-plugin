@@ -1,5 +1,8 @@
 # Azure Commons Plugin Changelog
 
+## Version 0.2.11, 2019-04-15
+* Fix waiting for connection from pool issue
+
 ## Version 0.2.10, 2019-03-28
 * Fix URL encode issue for IMDS endpoint
 
