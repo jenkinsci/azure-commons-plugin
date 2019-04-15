@@ -44,12 +44,13 @@ public class JenkinsTelemetryClient {
         Assert.hasText(eventName, "Event name should have text.");
 
         HttpPost post = new HttpPost(TELEMETRY_TARGET_URL);
+        CloseableHttpResponse execute = null;
         try {
             TelemetryEventData telemetryEventData = new TelemetryEventData(eventName, properties, instrumentKey);
             String content = MAPPER.writeValueAsString(telemetryEventData);
             HttpEntity entity = new StringEntity(content, ContentType.APPLICATION_JSON);
             post.setEntity(entity);
-            CloseableHttpResponse execute = CLIENT.execute(post);
+            execute = CLIENT.execute(post);
             int statusCode = execute.getStatusLine().getStatusCode();
             if (statusCode != HttpStatus.SC_OK) {
                 throw new IOException(String.format("Failed to send telemetry event %s, status code is %d, details: %s",
@@ -57,6 +58,9 @@ public class JenkinsTelemetryClient {
             }
         } finally {
             post.releaseConnection();
+            if (execute != null) {
+                execute.close();
+            }
         }
     }
 
