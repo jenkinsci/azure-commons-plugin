@@ -152,7 +152,7 @@ public class AppInsightsClient {
     }
 
     private void putJenkinsInfo(final Map<String, String> properties) {
-        final Jenkins j = Jenkins.getInstance();
+        final Jenkins j = Jenkins.getInstanceOrNull();
         if (j == null) {
             properties.put(AppInsightsConstants.PROP_JENKINS_INSTANCE_ID, "local");
             properties.put(AppInsightsConstants.PROP_JENKINS_VERSION, "local");
