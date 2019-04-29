@@ -34,7 +34,7 @@ public class AzureHttpRecorder {
     }
 
     public void record(HttpRecordable recordable) throws IOException {
-        if (appInsightsClient != null) {
+        if (appInsightsClient != null && AiProperties.enableAzureApiTrace()) {
             try {
                 sendTelemetry(recordable);
             } catch (Exception e) {

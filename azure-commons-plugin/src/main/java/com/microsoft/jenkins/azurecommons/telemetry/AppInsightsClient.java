@@ -14,11 +14,9 @@ import hudson.node_monitors.ArchitectureMonitor;
 import jenkins.model.Jenkins;
 import org.apache.commons.lang.StringUtils;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Properties;
 import java.util.logging.Logger;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -67,13 +65,7 @@ public class AppInsightsClient {
                 this.instrumentationKey = ikey;
                 LOGGER.info("Use AI instrumentation key from system properties or environment variables.");
             } else {
-                Properties prop = new Properties();
-                try {
-                    prop.load(AppInsightsClient.class.getClassLoader().getResourceAsStream("ai.properties"));
-                    this.instrumentationKey = prop.getProperty(INSTRUMENTATION_KEY_NAME);
-                } catch (IOException e) {
-                    LOGGER.severe("Failed to load application insights configuration file.");
-                }
+                this.instrumentationKey = AiProperties.getInstrumentationKey();
             }
         }
         telemetryClient = new JenkinsTelemetryClient(this.instrumentationKey);
@@ -83,6 +75,10 @@ public class AppInsightsClient {
         try {
             if (this.plugin != null && (AppInsightsGlobalConfig.get().isAppInsightsEnabled() || force)) {
                 final String eventName = buildEventName(item, action);
+                if (AiProperties.getFilteredEvents().contains(eventName)) {
+                    LOGGER.fine(String.format("Ignore event %s for App Insights.", eventName));
+                    return;
+                }
                 final Map<String, String> formalizedProperties = formalizeProperties(properties);
 
                 final JenkinsTelemetryClient client = getTelemetryClient();

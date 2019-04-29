@@ -15,6 +15,12 @@
     <description>Common APIs for Azure related Jenkins plugins</description>
     <url>https://wiki.jenkins-ci.org/display/JENKINS/Azure+Commons+Plugin</url>
 
+    <properties>
+        <enableAzureApiTrace>false</enableAzureApiTrace>
+        <enablePageDecorator>false</enablePageDecorator>
+        <filteredEvents/>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>
@@ -61,7 +67,7 @@
                 <artifactId>maven-hpi-plugin</artifactId>
                 <configuration>
                     <maskClasses>
-                        com.google.common.base.
+                        com.google.common.
                     </maskClasses>
                 </configuration>
             </plugin>
