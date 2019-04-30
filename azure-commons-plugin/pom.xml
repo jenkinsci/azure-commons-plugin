@@ -18,6 +18,7 @@
     <properties>
         <enableAzureApiTrace>false</enableAzureApiTrace>
         <enablePageDecorator>false</enablePageDecorator>
+        <enableRestartTrace>false</enableRestartTrace>
         <filteredEvents/>
     </properties>
 

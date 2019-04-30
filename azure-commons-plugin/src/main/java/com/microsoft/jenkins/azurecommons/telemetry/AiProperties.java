@@ -9,6 +9,7 @@ public final class AiProperties {
     private static final String INSTRUMENTATION_KEY_NAME = "InstrumentationKey";
     private static final String ENABLE_AZURE_API_TRACE_NAME = "EnableAzureApiTrace";
     private static final String ENABLE_PAGE_DECORATOR_NAME = "EnablePageDecorator";
+    private static final String ENABLE_RESTART_TRACE_NAME = "EnableRestartTrace";
     private static final String FILTERED_EVENTS_NAME = "FilteredEvents";
 
     private static final Properties PROP = new Properties();
@@ -32,6 +33,11 @@ public final class AiProperties {
 
     public static boolean enablePageDecorator() {
         String property = PROP.getProperty(ENABLE_PAGE_DECORATOR_NAME);
+        return Boolean.parseBoolean(property);
+    }
+
+    public static boolean enableRestartTrace() {
+        String property = PROP.getProperty(ENABLE_RESTART_TRACE_NAME);
         return Boolean.parseBoolean(property);
     }
 
