@@ -1,5 +1,9 @@
 # Azure Commons Plugin Changelog
 
+## Version 1.0.0, 2019-05-10
+* Bump Jenkins baseline to 2.60.3
+* Reduce AI metrics
+
 ## Version 0.2.11, 2019-04-15
 * Fix waiting for connection from pool issue
 
