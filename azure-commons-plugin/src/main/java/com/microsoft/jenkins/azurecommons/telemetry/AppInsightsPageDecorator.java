@@ -26,7 +26,8 @@ public class AppInsightsPageDecorator extends PageDecorator {
      */
     public boolean isDue() {
         // user opted out. no data collection.
-        if (!AppInsightsGlobalConfig.get().isAppInsightsEnabled()) {
+        if (!AppInsightsGlobalConfig.get().isAppInsightsEnabled()
+                || !AiProperties.enablePageDecorator()) {
             return false;
         }
 

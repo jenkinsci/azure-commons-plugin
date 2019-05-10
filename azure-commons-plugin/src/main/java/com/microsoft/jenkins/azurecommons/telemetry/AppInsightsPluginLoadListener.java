@@ -21,7 +21,9 @@ import java.io.IOException;
 public class AppInsightsPluginLoadListener extends RestartListener {
     @Override
     public boolean isReadyToRestart() throws IOException, InterruptedException {
-        AzureCommonsPlugin.sendEvent(AppInsightsConstants.JENKINS, AppInsightsConstants.RESTART);
+        if (AiProperties.enableRestartTrace()) {
+            AzureCommonsPlugin.sendEvent(AppInsightsConstants.JENKINS, AppInsightsConstants.RESTART);
+        }
         return true;
     }
 
