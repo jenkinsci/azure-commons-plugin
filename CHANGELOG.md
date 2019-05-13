@@ -1,5 +1,8 @@
 # Azure Commons Plugin Changelog
 
+## Version 1.0.2, 2019-05-13
+* Fix pom error configuration
+
 ## Version 1.0.1, 2019-05-10
 * Same as version 1.0.0 for unstable status of release 1.0.0
 
