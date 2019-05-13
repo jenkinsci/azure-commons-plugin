@@ -126,31 +126,34 @@
         </dependencies>
     </dependencyManagement>
 
+
+    <distributionManagement>
+        <repository>
+            <uniqueVersion>false</uniqueVersion>
+            <id>repo-vscjenkins.southeastasia.cloudapp.azure.com</id>
+            <url>http://repo-vscjenkins.southeastasia.cloudapp.azure.com/artifactory/list/libs-release-local/</url>
+        </repository>
+        <snapshotRepository>
+            <id>repo-vscjenkins.southeastasia.cloudapp.azure.com</id>
+            <url>http://repo-vscjenkins.southeastasia.cloudapp.azure.com/artifactory/list/libs-snapshot-local/</url>
+        </snapshotRepository>
+    </distributionManagement>
+
     <build>
         <plugins>
             <plugin>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.20.1</version>
             </plugin>
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.7.0</version>
                 <configuration>
-                    <source>1.7</source>
-                    <target>1.7</target>
+                    <source>1.8</source>
+                    <target>1.8</target>
                 </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>attach-sources</id>
-                        <goals>
-                            <goal>jar</goal>
-                        </goals>
-                    </execution>
-                </executions>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
