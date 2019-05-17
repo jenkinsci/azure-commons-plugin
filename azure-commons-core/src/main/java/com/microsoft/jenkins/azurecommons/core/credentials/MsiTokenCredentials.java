@@ -44,7 +44,7 @@ public class MsiTokenCredentials extends AbstractTokenCredentials {
 
     protected static String requestLocalMsiEndpoint(final String resource, final int msiPort) throws IOException {
         HttpLoggingInterceptor loggingInterceptor = new HttpLoggingInterceptor();
-        loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
+        loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BASIC);
 
         OkHttpClient client = new OkHttpClient.Builder()
                 .addInterceptor(loggingInterceptor)
