@@ -29,7 +29,8 @@ public class AppInsightsPluginLoadListener extends RestartListener {
 
     @Initializer(after = InitMilestone.PLUGINS_STARTED)
     public static void onPluginsLoaded(final Jenkins jenkins) {
-        traceAzurePlugins(jenkins, AppInsightsConstants.LOAD);
+        Thread thread = new Thread(() -> traceAzurePlugins(jenkins, AppInsightsConstants.LOAD));
+        thread.start();
     }
 
     public static void traceAzurePlugins(final Jenkins jenkins, final String action) {

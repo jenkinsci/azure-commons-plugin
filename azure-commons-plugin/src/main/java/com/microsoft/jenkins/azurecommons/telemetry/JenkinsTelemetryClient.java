@@ -21,10 +21,13 @@ public class JenkinsTelemetryClient {
     private static final String INSTRUMENT_KEY_ASSERT_MESSAGE = "Instrument key should have text.";
     private static final String TELEMETRY_TARGET_URL = "https://dc.services.visualstudio.com/v2/track";
     private static final int REQUEST_TIMEOUT = 5000;
+    private static final int CONNECT_TIMEOUT = 5000;
     private static final ObjectMapper MAPPER = new ObjectMapper();
     private static final CloseableHttpClient CLIENT = HttpClients.custom()
             .setRetryHandler(new DefaultHttpRequestRetryHandler())
-            .setDefaultRequestConfig(RequestConfig.custom().setConnectionRequestTimeout(REQUEST_TIMEOUT).build())
+            .setDefaultRequestConfig(RequestConfig.custom()
+                    .setConnectionRequestTimeout(REQUEST_TIMEOUT)
+                    .setConnectTimeout(CONNECT_TIMEOUT).build())
             .setConnectionManager(new PoolingHttpClientConnectionManager())
             .build();
 
