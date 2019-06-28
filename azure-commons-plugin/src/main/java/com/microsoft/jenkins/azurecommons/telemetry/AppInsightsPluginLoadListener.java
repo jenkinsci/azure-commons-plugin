@@ -16,9 +16,12 @@ import hudson.model.RestartListener;
 import jenkins.model.Jenkins;
 
 import java.io.IOException;
+import java.util.logging.Logger;
 
 @Extension
 public class AppInsightsPluginLoadListener extends RestartListener {
+    private static final Logger LOGGER = Logger.getLogger(AppInsightsPluginLoadListener.class.getName());
+
     @Override
     public boolean isReadyToRestart() throws IOException, InterruptedException {
         if (AiProperties.enableRestartTrace()) {
@@ -29,7 +32,11 @@ public class AppInsightsPluginLoadListener extends RestartListener {
 
     @Initializer(after = InitMilestone.PLUGINS_STARTED)
     public static void onPluginsLoaded(final Jenkins jenkins) {
-        traceAzurePlugins(jenkins, AppInsightsConstants.LOAD);
+        Thread.UncaughtExceptionHandler exceptionHandler = (th, ex) ->
+                LOGGER.severe("Exception in sending load events: " + ex);
+        Thread thread = new Thread(() -> traceAzurePlugins(jenkins, AppInsightsConstants.LOAD));
+        thread.setUncaughtExceptionHandler(exceptionHandler);
+        thread.start();
     }
 
     public static void traceAzurePlugins(final Jenkins jenkins, final String action) {
