@@ -1,5 +1,9 @@
 # Azure Commons Plugin Changelog
 
+## Version 1.0.4, 2019-07-18
+* Remove range dependencies
+* Fix possible block for network issues
+
 ## Version 1.0.3, 2019-05-22
 * Remove some unnecessary logs
 
