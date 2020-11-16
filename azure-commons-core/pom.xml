@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.jenkins-ci.plugins</groupId>
         <artifactId>azure-commons-parent</artifactId>
-        <version>1.0.6-SNAPSHOT</version>
+        <version>${revision}${changelist}</version>
     </parent>
 
     <artifactId>azure-commons-core</artifactId>
