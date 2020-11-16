@@ -13,7 +13,7 @@
 
     <name>Azure Commons Plugin</name>
     <description>Common APIs for Azure related Jenkins plugins</description>
-    <url>https://wiki.jenkins-ci.org/display/JENKINS/Azure+Commons+Plugin</url>
+    <url>https://github.com/jenkinsci/azure-commons-plugin/blob/dev/azure-commons-plugin/README.md</url>
 
     <properties>
         <enableAzureApiTrace>false</enableAzureApiTrace>
