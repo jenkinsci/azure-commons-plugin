@@ -1,5 +1,8 @@
 # Azure Commons Plugin Changelog
 
+## Version 1.1.0, 2020-12-23
+* Add compatibility with > 2.263
+
 ## Version 1.0.5, 2020-10-26
 * Update maintainer
 
