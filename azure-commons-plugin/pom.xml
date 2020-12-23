@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.jenkins-ci.plugins</groupId>
         <artifactId>azure-commons-parent</artifactId>
-        <version>1.0.6-SNAPSHOT</version>
+        <version>${revision}${changelist}</version>
     </parent>
 
     <artifactId>azure-commons</artifactId>
@@ -13,7 +13,7 @@
 
     <name>Azure Commons Plugin</name>
     <description>Common APIs for Azure related Jenkins plugins</description>
-    <url>https://wiki.jenkins-ci.org/display/JENKINS/Azure+Commons+Plugin</url>
+    <url>https://github.com/jenkinsci/azure-commons-plugin/blob/dev/azure-commons-plugin/README.md</url>
 
     <properties>
         <enableAzureApiTrace>false</enableAzureApiTrace>
@@ -31,17 +31,10 @@
         <dependency>
             <groupId>org.jenkins-ci.plugins.workflow</groupId>
             <artifactId>workflow-step-api</artifactId>
-            <version>2.10</version>
         </dependency>
         <dependency>
             <groupId>org.jenkins-ci.plugins</groupId>
             <artifactId>ssh-credentials</artifactId>
-            <version>1.13</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpclient</artifactId>
-            <version>4.5.7</version>
         </dependency>
     </dependencies>
 

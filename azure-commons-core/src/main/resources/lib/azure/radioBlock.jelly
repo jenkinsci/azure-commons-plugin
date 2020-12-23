@@ -23,7 +23,7 @@ THE SOFTWARE.
 -->
 
 <?jelly escape-by-default='true'?>
-<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:f="/lib/form">
   <st:documentation>
     Radio button with a label that hides additional controls.
     When checked, those additional controls are displayed. This is useful
@@ -53,30 +53,29 @@ THE SOFTWARE.
   </st:documentation>
 
   <st:adjunct includes="lib.azure.radioBlock.radioBlock"/>
-  <tr class="radio-block-start row-group-start ${attrs.inline?'':'row-set-start'}" hasHelp="${attrs.help!=null}" ><!-- this ID marks the beginning -->
-    <td class="setting-leftspace"><st:nbsp/></td>
-    <td>
-      <label>
-        <input type="radio" name="${name}" value="${value}"
-               class="radio-block-control block-control" checked="${checked?'true':null}" />
-        ${title}
-      </label>
-    </td>
-    <f:helpLink url="${help}" featureName="${title}" />
-  </tr>
-  <j:if test="${attrs.help!=null}">
-    <f:helpArea />
-  </j:if>
-
-  <tr class="radioblock-invokeBody">
-    <td class="setting-leftspace"><st:nbsp/></td>
-    <td class="setting-main" colspan="3">
-      <table width="100%">
-        <d:invokeBody/>
-      </table>
-    </td>
-  </tr>
-
-  <!-- end marker -->
-  <tr class="${attrs.inline?'':'row-set-end'} radio-block-end row-group-end" style="display:none" />
+  <div class="radioBlock-container">
+    <div class="tr help-sibling radio-block-start row-group-start ${attrs.inline?'':'row-set-start'}" hasHelp="${attrs.help!=null}"><!-- this ID marks the beginning -->
+      <div colspan="3">
+        <label>
+          <input type="radio"
+                 name="${name}"
+                 value="${value}"
+                 class="radio-block-control block-control"
+                 checked="${checked ? 'true' : null}"
+                 disabled="${readOnlyMode ? 'true' : null}"
+          />
+          ${title}
+        </label>
+        <f:helpLink url="${help}" featureName="${title}" />
+      </div>
+    </div>
+    <j:if test="${attrs.help!=null}">
+      <f:helpArea />
+    </j:if>
+    <div class="form-container tr">
+      <d:invokeBody />
+    </div>
+    <!-- end marker -->
+    <div class="tr ${attrs.inline?'':'row-set-end'} radio-block-end row-group-end" style="display:none"></div>
+  </div>
 </j:jelly>
