@@ -9,7 +9,7 @@
 
     <artifactId>azure-commons-parent</artifactId>
     <packaging>pom</packaging>
-    <version>1.1.1</version>
+    <version>${revision}${changelist}</version>
     <name>Azure Commons Pom</name>
 
     <modules>
@@ -18,7 +18,7 @@
     </modules>
 
     <properties>
-        <revision>1.1.1</revision>
+        <revision>1.1.2</revision>
         <changelist>-SNAPSHOT</changelist>
         <gitHubRepo>jenkinsci/azure-commons-plugin</gitHubRepo>
         <jenkins.version>2.266</jenkins.version>
@@ -44,7 +44,7 @@
         <connection>scm:git:git://github.com/${gitHubRepo}.git</connection>
         <developerConnection>scm:git:git@github.com:${gitHubRepo}.git</developerConnection>
         <url>https://github.com/${gitHubRepo}</url>
-        <tag>azure-commons-parent-1.1.1</tag>
+        <tag>${scmTag}</tag>
     </scm>
 
     <repositories>
