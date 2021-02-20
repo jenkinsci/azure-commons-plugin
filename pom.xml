@@ -9,7 +9,7 @@
 
     <artifactId>azure-commons-parent</artifactId>
     <packaging>pom</packaging>
-    <version>${revision}${changelist}</version>
+    <version>1.1.1</version>
     <name>Azure Commons Pom</name>
 
     <modules>
@@ -44,7 +44,7 @@
         <connection>scm:git:git://github.com/${gitHubRepo}.git</connection>
         <developerConnection>scm:git:git@github.com:${gitHubRepo}.git</developerConnection>
         <url>https://github.com/${gitHubRepo}</url>
-        <tag>${scmTag}</tag>
+        <tag>azure-commons-parent-1.1.1</tag>
     </scm>
 
     <repositories>
