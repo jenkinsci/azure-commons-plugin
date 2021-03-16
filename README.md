@@ -1,6 +1,6 @@
 # Azure Commons Parent Repo
 
-> ***Important***: This plugin is used by some Azure plugins which are being retired and will be out of support as of February 29, 2024. Azure CLI is the currently recommended way to integrate Jenkins with Azure services.
+> ***Important***: This plug-in is maintained by the Jenkins community and won’t be supported by Microsoft as of February 29, 2024.
 
 This repo contains two modules:
 * [Azure Common Core Library](./azure-commons-core/README.md)
