@@ -1,5 +1,7 @@
 # Azure Commons Plugin
 
+> ***Important***: This plug-in is maintained by the Jenkins community and won’t be supported by Microsoft as of February 29, 2024.
+
 A Jenkins plugin which provides common APIs for Azure related Jenkins plugins.
 
 ## How to Install
