@@ -1,5 +1,7 @@
 # Azure Commons Plugin Changelog
 
+See [GitHub releases](https://github.com/jenkinsci/azure-commons-plugin/releases) for all newer versions.
+
 ## Version 1.1.1, 2021-02-20
 * Update document
 
