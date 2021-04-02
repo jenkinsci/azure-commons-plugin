@@ -54,7 +54,7 @@ public class AppInsightsClient {
                     && System.getenv("APPLICATION_INSIGHTS_IKEY") == null) {
                 // Inject the test AI instrumentation key.
                 this.instrumentationKey = "712adcab-2593-48c6-8367-8a940f483bc1";
-                LOGGER.info("Use test AI instrumentation key for " + plugin.getClass().getName());
+                LOGGER.fine("Use test AI instrumentation key for " + plugin.getClass().getName());
             }
         } else {
             String ikey = System.getProperty("APPLICATION_INSIGHTS_IKEY");
@@ -63,7 +63,7 @@ public class AppInsightsClient {
             }
             if (ikey != null) {
                 this.instrumentationKey = ikey;
-                LOGGER.info("Use AI instrumentation key from system properties or environment variables.");
+                LOGGER.fine("Use AI instrumentation key from system properties or environment variables.");
             } else {
                 this.instrumentationKey = AiProperties.getInstrumentationKey();
             }
@@ -71,23 +71,10 @@ public class AppInsightsClient {
         telemetryClient = new JenkinsTelemetryClient(this.instrumentationKey);
     }
 
+    /**
+     * No-OP, first step of retiring analytics.
+     */
     public void sendEvent(String item, String action, Map<String, String> properties, boolean force) {
-        try {
-            if (this.plugin != null && (AppInsightsGlobalConfig.get().isAppInsightsEnabled() || force)) {
-                final String eventName = buildEventName(item, action);
-                if (AiProperties.getFilteredEvents().contains(eventName)) {
-                    LOGGER.fine(String.format("Ignore event %s for App Insights.", eventName));
-                    return;
-                }
-                final Map<String, String> formalizedProperties = formalizeProperties(properties);
-
-                final JenkinsTelemetryClient client = getTelemetryClient();
-                client.send(eventName, formalizedProperties);
-                LOGGER.fine("AI: " + eventName);
-            }
-        } catch (Exception e) {
-            LOGGER.warning("Fail to send trace to App Insights due to:" + e.getMessage());
-        }
     }
 
     /*
