@@ -24,9 +24,11 @@ import com.microsoft.jenkins.azurecommons.core.credentials.RemoteImdsTokenCreden
 import com.microsoft.jenkins.azurecommons.core.credentials.RemoteMsiTokenCredentials;
 import com.microsoft.jenkins.azurecommons.core.credentials.TokenCredentialData;
 import jenkins.model.Jenkins;
+import org.apache.commons.lang3.StringUtils;
 
 import javax.annotation.Nonnull;
 import java.io.IOException;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public final class AzureClientFactory {
@@ -36,7 +38,7 @@ public final class AzureClientFactory {
     public static String getUserAgent(String pluginName, String version) {
         String instanceId = null;
         try {
-            instanceId = Jenkins.getActiveInstance().getLegacyInstanceId();
+            instanceId = Jenkins.get().getLegacyInstanceId();
         } catch (Exception e) {
         }
 
@@ -96,7 +98,7 @@ public final class AzureClientFactory {
         } else if (data.getType() == TokenCredentialData.TYPE_MSI) {
             return getClient(data.getMsiPort(), env, configurer);
         } else if (data.getType() == TokenCredentialData.TYPE_IMDS) {
-            return getClient(env, configurer);
+            return getImdsClient(env, configurer, data.getSubscriptionId());
         } else {
             throw new UnsupportedOperationException("Unknown data type: " + data.getType());
         }
@@ -170,10 +172,35 @@ public final class AzureClientFactory {
 
     @Nonnull
     public static Azure getClient(final AzureEnvironment env) {
+        LOGGER.log(Level.WARNING, "Call to flawed implementation of getClient, "
+                + "replace with #getImdsClient", new RuntimeException());
         return getClient(env, null);
     }
 
     @Nonnull
+    public static Azure getImdsClient(final AzureEnvironment env, final Configurer configurer, String subscriptionId) {
+        ImdsTokenCredentials imdsToken = new RemoteImdsTokenCredentials(env);
+        try {
+            if (StringUtils.isNotBlank(subscriptionId)) {
+                return azure(configurer)
+                        .authenticate(imdsToken)
+                        .withSubscription(subscriptionId);
+            }
+
+            return azure(configurer)
+                    .authenticate(imdsToken)
+                    .withDefaultSubscription();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * Flawed implementation that only works with the default subscription.
+     * Use {@link #getImdsClient(AzureEnvironment, Configurer, String)} instead
+     */
+    @Nonnull
+    @Deprecated
     public static Azure getClient(final AzureEnvironment env, final Configurer configurer) {
         ImdsTokenCredentials imdsToken = new RemoteImdsTokenCredentials(env);
         try {

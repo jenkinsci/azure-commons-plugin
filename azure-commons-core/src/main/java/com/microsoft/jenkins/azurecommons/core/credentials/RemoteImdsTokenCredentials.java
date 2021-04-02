@@ -9,7 +9,7 @@ package com.microsoft.jenkins.azurecommons.core.credentials;
 import com.microsoft.azure.AzureEnvironment;
 import hudson.remoting.Callable;
 import hudson.remoting.VirtualChannel;
-import hudson.slaves.SlaveComputer;
+import jenkins.agents.AgentComputerUtil;
 import org.jenkinsci.remoting.RoleChecker;
 
 import java.io.IOException;
@@ -29,7 +29,7 @@ public class RemoteImdsTokenCredentials extends ImdsTokenCredentials {
 
     @Override
     protected Token acquireAccessToken(final String resource) throws IOException {
-        VirtualChannel channel = SlaveComputer.getChannelToMaster();
+        VirtualChannel channel = AgentComputerUtil.getChannelToMaster();
         if (channel == null) {
             throw new RuntimeException("Failed to get the channel to master. Please check the running environment.");
         }
