@@ -47,21 +47,10 @@ public class AzureHttpRecorder {
         return appInsightsClient;
     }
 
+    /**
+     * No-OP, first step of retiring analytics.
+     */
     private void sendTelemetry(HttpRecordable recordable) {
-        final Map<String, String> properties = new HashMap<>();
-        final HttpUrl httpUrl = HttpUrl.get(recordable.getRequestUri());
-        final String objectName = parseProvider(httpUrl, properties);
-        if (objectName == null) {
-            // Might not be a standard API path. Ignore
-            return;
-        }
-        properties.put(API_VERSION, httpUrl.queryParameter(API_VERSION));
-        properties.put(RESPONSE_CODE, String.valueOf(recordable.getHttpCode()));
-        properties.put(RESPONSE_MESSAGE, recordable.getHttpMessage());
-        properties.put(MS_REQUEST_ID, recordable.getRequestId());
-        properties.putAll(recordable.getExtraProperties());
-        parseSubscriptionId(httpUrl, properties);
-        appInsightsClient.sendEvent(AppInsightsConstants.AZURE_REST, recordable.getHttpMethod(), properties, false);
     }
 
     private String parseProvider(HttpUrl httpUrl, Map<String, String> properties) {
