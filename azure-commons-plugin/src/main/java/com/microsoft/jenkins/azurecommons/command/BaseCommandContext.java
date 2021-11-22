@@ -14,8 +14,7 @@ import hudson.model.TaskListener;
 import org.jenkinsci.plugins.workflow.steps.Step;
 import org.jenkinsci.plugins.workflow.steps.StepContext;
 import org.jenkinsci.plugins.workflow.steps.StepExecution;
-
-import static com.google.common.base.Preconditions.checkNotNull;
+import java.util.Objects;
 
 /**
  * A mixed abstract base class with both command data and command service data.
@@ -73,7 +72,7 @@ public abstract class BaseCommandContext extends Step implements ICommandService
     }
 
     public void executeCommands() {
-        checkNotNull(commandService, "configure should be called prior to execution");
+        Objects.requireNonNull(commandService, "configure should be called prior to execution");
         commandService.executeCommands(this);
     }
 

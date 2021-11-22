@@ -12,9 +12,8 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.logging.Logger;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 public class AzureHttpRecorder {
     private static final Logger LOGGER = Logger.getLogger(AzureHttpRecorder.class.getName());
@@ -92,7 +91,7 @@ public class AzureHttpRecorder {
         }
 
         public HttpRecordable withRequestUri(URI uri) {
-            checkNotNull(uri);
+            Objects.requireNonNull(uri);
             this.requestUri = uri;
             return this;
         }
@@ -102,7 +101,7 @@ public class AzureHttpRecorder {
         }
 
         public HttpRecordable withHttpMethod(String method) {
-            checkNotNull(method);
+            Objects.requireNonNull(method);
             this.httpMethod = method;
             return this;
         }

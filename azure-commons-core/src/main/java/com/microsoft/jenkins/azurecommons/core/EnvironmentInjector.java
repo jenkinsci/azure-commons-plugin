@@ -16,8 +16,7 @@ import javax.annotation.Nonnull;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-
-import static com.google.common.base.Preconditions.checkNotNull;
+import java.util.Objects;
 
 public final class EnvironmentInjector {
     /**
@@ -47,7 +46,7 @@ public final class EnvironmentInjector {
      * @see <a href="https://issues.jenkins-ci.org/browse/JENKINS-29537">JENKINS-29537</a>
      */
     public static void inject(Run<?, ?> run, EnvVars envVars, String name, Object value) {
-        checkNotNull(value, "environment variable value is null");
+        Objects.requireNonNull(value, "environment variable value is null");
         String strVal = value.toString();
         if (envVars != null) {
             envVars.put(name, strVal);

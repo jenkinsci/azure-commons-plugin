@@ -5,7 +5,6 @@
 
 package com.microsoft.jenkins.azurecommons.command;
 
-import com.google.common.collect.ImmutableSet;
 import hudson.EnvVars;
 import hudson.FilePath;
 import hudson.Launcher;
@@ -14,6 +13,10 @@ import hudson.model.TaskListener;
 import jenkins.tasks.SimpleBuildStep;
 import org.jenkinsci.plugins.workflow.steps.StepContext;
 import org.jenkinsci.plugins.workflow.steps.SynchronousNonBlockingStepExecution;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Provides the basic implementation of {@link org.jenkinsci.plugins.workflow.steps.StepExecution} which can be used
@@ -33,8 +36,15 @@ import org.jenkinsci.plugins.workflow.steps.SynchronousNonBlockingStepExecution;
  * at least {@link SimpleBuildStepExecution#REQUIRED_CONTEXT}.
  */
 public class SimpleBuildStepExecution extends SynchronousNonBlockingStepExecution<Void> {
-    public static final ImmutableSet<? extends Class<?>> REQUIRED_CONTEXT =
-            ImmutableSet.of(Run.class, FilePath.class, Launcher.class, TaskListener.class, EnvVars.class);
+    public static final Set<? extends Class<?>> REQUIRED_CONTEXT =
+            Collections.unmodifiableSet(
+                    new HashSet<>(
+                            Arrays.asList(
+                                    Run.class,
+                                    FilePath.class,
+                                    Launcher.class,
+                                    TaskListener.class,
+                                    EnvVars.class)));
 
     private static final long serialVersionUID = 1L;
 

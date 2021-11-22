@@ -5,8 +5,6 @@
 
 package com.microsoft.jenkins.azurecommons.command;
 
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
 import com.microsoft.jenkins.azurecommons.JobContext;
 import hudson.EnvVars;
 import org.junit.Before;
@@ -16,7 +14,11 @@ import org.mockito.stubbing.Answer;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
@@ -59,8 +61,11 @@ public class CommandServiceTest {
                 .build();
         assertNull(commandService.getCleanUpCommand());
         assertEquals(CSuccess.class, commandService.getStartCommandClass());
-        assertEquals(ImmutableSet.of(CSuccess.class, CChoice.class, CSuccess2.class, CError.class), commandService.getRegisteredCommands());
-        assertEquals(ImmutableMap.of(CSuccess.class, CChoice.class, CSuccess2.class, CError.class), commandService.getTransitions());
+        assertEquals(new HashSet<>(Arrays.asList(CSuccess.class, CChoice.class, CSuccess2.class, CError.class)), commandService.getRegisteredCommands());
+        Map<Class<? extends ICommand>, Class<? extends ICommand>> expected = new HashMap<>();
+        expected.put(CSuccess.class, CChoice.class);
+        expected.put(CSuccess2.class, CError.class);
+        assertEquals(expected, commandService.getTransitions());
     }
 
     @Test
@@ -71,7 +76,7 @@ public class CommandServiceTest {
                 .withStartCommand(CSuccess.class)
                 .build();
 
-        assertEquals(ImmutableMap.of(CSuccess.class, CSuccess2.class), commandService.getTransitions());
+        assertEquals(Collections.singletonMap(CSuccess.class, CSuccess2.class), commandService.getTransitions());
 
         commandService.executeCommands(commandServiceData);
         verify(commandServiceData, times(2)).setLastCommandState(CommandState.Success);
@@ -101,7 +106,7 @@ public class CommandServiceTest {
                 .withStartCommand(CChoice.class)
                 .build();
 
-        assertEquals(ImmutableMap.of(CChoice.class, CError.class), commandService.getTransitions());
+        assertEquals(Collections.singletonMap(CChoice.class, CError.class), commandService.getTransitions());
 
         commandService.executeCommands(commandServiceData);
         verify(commandServiceData, times(2)).setLastCommandState(CommandState.Success);
@@ -118,7 +123,10 @@ public class CommandServiceTest {
                 .withStartCommand(CSuccess.class)
                 .build();
 
-        assertEquals(ImmutableMap.of(CSuccess.class, CDone.class, CDone.class, CError.class), commandService.getTransitions());
+        Map<Class<? extends ICommand>, Class<? extends ICommand>> expected = new HashMap<>();
+        expected.put(CSuccess.class, CDone.class);
+        expected.put(CDone.class, CError.class);
+        assertEquals(expected, commandService.getTransitions());
 
         commandService.executeCommands(commandServiceData);
         verify(commandServiceData, times(1)).setLastCommandState(CommandState.Success);

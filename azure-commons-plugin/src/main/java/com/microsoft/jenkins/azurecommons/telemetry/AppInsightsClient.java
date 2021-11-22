@@ -17,9 +17,8 @@ import org.apache.commons.lang.StringUtils;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Objects;
 import java.util.logging.Logger;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Client for App Insights.
@@ -81,14 +80,14 @@ public class AppInsightsClient {
        Override instrumentationKey() if you are connecting to another AI.
     */
     public AppInsightsClient withInstrumentationKey(String key) {
-        checkNotNull(key, "Parameter instrumentation key is null.");
+        Objects.requireNonNull(key, "Parameter instrumentation key is null.");
         this.instrumentationKey = key;
         this.telemetryClient.setInstrumentKey(key);
         return this;
     }
 
     public AppInsightsClient withEventNamePrefix(String prefix) {
-        checkNotNull(prefix, "Parameter event name prefix is null.");
+        Objects.requireNonNull(prefix, "Parameter event name prefix is null.");
         this.eventNamePrefix = prefix;
         return this;
     }

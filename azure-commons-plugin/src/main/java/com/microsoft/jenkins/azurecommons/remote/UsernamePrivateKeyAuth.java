@@ -5,27 +5,33 @@
 
 package com.microsoft.jenkins.azurecommons.remote;
 
-import com.google.common.collect.ImmutableList;
 import com.microsoft.jenkins.azurecommons.Constants;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * SSH authentication credentials with username and private keys.
  */
 class UsernamePrivateKeyAuth extends UsernameAuth {
     private final String passPhrase;
-    private final ImmutableList<String> privateKeys;
+    private final List<String> privateKeys;
 
     UsernamePrivateKeyAuth(String username, String passPhrase, String... privateKeys) {
         this(username, passPhrase, Arrays.asList(privateKeys));
     }
 
-    UsernamePrivateKeyAuth(String username, String passPhrase, Iterable privateKeys) {
+    UsernamePrivateKeyAuth(String username, String passPhrase, Iterable<String> privateKeys) {
         super(username);
         this.passPhrase = passPhrase;
         //noinspection unchecked
-        this.privateKeys = ImmutableList.<String>copyOf(privateKeys);
+        List<String> privateKeyList = new ArrayList<>();
+        for (String privateKey : privateKeys) {
+            privateKeyList.add(privateKey);
+        }
+        this.privateKeys = Collections.unmodifiableList(privateKeyList);
     }
 
     byte[] getPassPhraseBytes() {
@@ -35,7 +41,7 @@ class UsernamePrivateKeyAuth extends UsernameAuth {
         return passPhrase.getBytes(Constants.UTF8);
     }
 
-    ImmutableList<String> getPrivateKeys() {
+    List<String> getPrivateKeys() {
         return privateKeys;
     }
 }

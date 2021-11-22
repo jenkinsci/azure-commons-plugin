@@ -5,14 +5,12 @@
 
 package com.microsoft.jenkins.azurecommons.command;
 
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
-
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
-
-import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.base.Preconditions.checkState;
+import java.util.Objects;
+import java.util.Set;
 
 /**
  * State machine for command execution.
@@ -48,20 +46,20 @@ public final class CommandService {
         return startCommand;
     }
 
-    public ImmutableMap<Class, Class> getTransitions() {
-        ImmutableMap.Builder<Class, Class> builder = ImmutableMap.builder();
+    public Map<Class<? extends ICommand>, Class<? extends ICommand>> getTransitions() {
+        Map<Class<? extends ICommand>, Class<? extends ICommand>> builder = new HashMap<>();
         for (Map.Entry<Class<? extends ICommand>, Class<? extends ICommand>> entry : transitionMap.entrySet()) {
             builder.put(entry.getKey(), entry.getValue());
         }
-        return builder.build();
+        return Collections.unmodifiableMap(builder);
     }
 
-    public ImmutableSet<Class> getRegisteredCommands() {
-        ImmutableSet.Builder<Class> builder = ImmutableSet.builder();
+    public Set<Class<? extends ICommand>> getRegisteredCommands() {
+        Set<Class<? extends ICommand>> builder = new HashSet<>();
         for (Class<? extends ICommand> clazz : instanceMap.keySet()) {
             builder.add(clazz);
         }
-        return builder.build();
+        return Collections.unmodifiableSet(builder);
     }
 
     /**
@@ -81,9 +79,9 @@ public final class CommandService {
     }
 
     private CommandState runCommand(Class<? extends ICommand> clazz, ICommandServiceData commandServiceData) {
-        checkNotNull(clazz);
+        Objects.requireNonNull(clazz);
         ICommand<IBaseCommandData> command = ensureCreation(clazz, instanceMap);
-        checkNotNull(command);
+        Objects.requireNonNull(command);
         IBaseCommandData commandData = commandServiceData.getDataForCommand(command);
         command.execute(commandData);
         return commandData.getCommandState();
@@ -165,7 +163,7 @@ public final class CommandService {
          * @return the builder itself
          */
         public Builder withStartCommand(Class<? extends ICommand<? extends IBaseCommandData>> command) {
-            checkNotNull(command);
+            Objects.requireNonNull(command);
             this.startCmd = command;
             ensureCreation(command, instanceMap);
             return this;
@@ -179,7 +177,7 @@ public final class CommandService {
          * @return the builder itself.
          */
         public Builder withCleanUpCommand(Class<? extends ICommand<? extends IBaseCommandData>> command) {
-            checkNotNull(command);
+            Objects.requireNonNull(command);
             this.cleanUpCommand = command;
             ensureCreation(command, instanceMap);
             return this;
@@ -200,8 +198,10 @@ public final class CommandService {
         }
 
         public CommandService build() {
-            checkState(!instanceMap.isEmpty());
-            checkNotNull(startCmd);
+            if (instanceMap.isEmpty()) {
+                throw new IllegalStateException();
+            }
+            Objects.requireNonNull(startCmd);
             return new CommandService(transitionMap, instanceMap, startCmd, cleanUpCommand);
         }
     }
